@@ -1,25 +1,26 @@
-import logo from './archi_magna.png';
+import logo from './img/archi_magna.png';
 import './App.css';
-import axios from 'axios'
 import {useEffect, useState} from "react";
-import {AddUser, GetUserList} from "./api/api";
-
-axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+import api from "./api/api";
+import {useParams} from "react-router-dom";
+import {ActionInfo} from "./api/ArchiMagnaDefine";
 
 function Member() {
   const [users, setUsers] = useState([])
-
+  const [myInfo, setMyInfo] = useState([])
   const [userName, setUserName] = useState("")
+  const {room, token} = useParams();
 
   useEffect(() => {
-    UpdateUserList()
-  }, [])
+    if(!token){
+      return;
+    }
+    console.log([room, token])
+    api.GetUserInfo(token).then(r => setMyInfo(r.data))
+  }, [token, room])
 
-  function UpdateUserList(){
-    GetUserList().then(res => {
-      setUsers(res.data)
-    })
+  if(!token){
+    return <>no token</>
   }
 
   return (
@@ -32,7 +33,7 @@ function Member() {
           Text input: <input name="myInput" type="text"
                              value={userName} onChange={(e) => setUserName(e.target.value)}/>
         </label>
-        <button onClick={() => AddUser(userName).then(res => {
+        <button onClick={() => api.AddUser(userName).then(res => {
           setUsers(res.data)
         })}>送信
         </button>
@@ -40,6 +41,15 @@ function Member() {
         {users.map(user => {
           return <div key={'id_' + user.ID}>{user.USER_NAME}, {user.UPD_DATE}</div>
         })}
+
+
+        {myInfo ?
+          <>現在可能なアクション
+            {Object.entries(ActionInfo).filter(r => r[1].Role === myInfo.ROLE).map(r => {
+              return <div key={"action_" + r[0]}>{r[1].Name}</div>
+            })}
+          </> : ''
+        }
       </header>
     </div>
   );

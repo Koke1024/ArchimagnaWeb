@@ -1,3 +1,16 @@
+html{
+  background-color: #282c34;
+}
+
+*{
+  /*color: #FFF;*/
+  font-family: 'M+P', sans-serif;
+}
+
+body{
+  color: #FFF;
+}
+
 .App {
   text-align: center;
 }
@@ -7,26 +20,46 @@
   pointer-events: none;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.drac-btn{
+  font-family: 'M+P', sans-serif;
+}
+
+input{
+  -webkit-appearance: textfield;
+  background: var(--blackSecondary);
+  border: .3rem solid transparent;
+  border-radius: var(--rounded-lg);
+  box-sizing: border-box;
+  outline: none;
+  transition: all .3s ease-in-out;
+  width: 100%;
+  padding: 10px;
+
+  color: #d5d5d5;
+}
+
+.Square{
+  background: var(--blackTernary);
+  border: .3rem solid transparent;
+  border-radius: var(--rounded-lg);
+  box-sizing: border-box;
+  outline: none;
+  transition: all .3s ease-in-out;
+  padding: 10px;
+  margin: 10px;
+  color: var(--blackSecondary);
+}
+
+.Item{
+  background: var(--blackSecondary);
+  /*border: .3rem solid transparent;*/
+  border-radius: var(--rounded-lg);
+  /*box-sizing: border-box;*/
+  /*outline: none;*/
+  transition: all .3s ease-in-out;
+  color: var(--blackTernary);
 }
