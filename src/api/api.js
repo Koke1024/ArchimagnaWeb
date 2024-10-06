@@ -52,12 +52,32 @@ class ApiClass{
   //   return axios.post(baseURL + '/room/info', param);
   // }
 
-  GetRoomInfo(token){
+  GetRoomInfo(roomToken){
     let param = {
-      TOKEN: token,
+      TOKEN: roomToken,
     }
     console.log(param)
     return axios.get(baseURL + '/room/info', {params: param});
+  }
+  GetRoomInfoFromUser(userId, userToken){
+    let param = {
+      USER_ID: userId,
+      TOKEN: userToken,
+    }
+    return axios.get(baseURL + '/room/info_by_user', {params: param});
+  }
+  SetRoleAutomated(roomId){
+    let param = {
+      ROOM_ID: roomId,
+    }
+    return axios.post(baseURL + '/room/assign/auto', param);
+  }
+
+  NextPhase(roomId){
+    let param = {
+      ROOM_ID: roomId,
+    }
+    return axios.post(baseURL + '/room/next', param);
   }
 
   TruncateAll(){

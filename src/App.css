@@ -11,12 +11,19 @@ body{
   color: #FFF;
 }
 
+.day_info{
+  font-weight: normal;
+  font-size: 2em;
+  width: 50%;
+  margin: 20px auto;
+}
+
 .App {
   text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 20vmin;
   pointer-events: none;
 }
 
@@ -52,6 +59,25 @@ input{
   padding: 10px;
   margin: 10px;
   color: var(--blackSecondary);
+  width: 50%;
+}
+
+.Phase{
+  background: var(--blackTernary);
+  border: .1rem solid transparent;
+  border-radius: var(--rounded-lg);
+  padding: 10px;
+  margin: auto;
+  width: 50%;
+}
+.phase_box{
+  border-radius: var(--rounded-lg);
+  font-weight: 800;
+  padding: 8px 4px;
+  writing-mode: vertical-rl;
+}
+.current_phase{
+  background-color: yellow;
 }
 
 .Item{
@@ -62,4 +88,56 @@ input{
   /*outline: none;*/
   transition: all .3s ease-in-out;
   color: var(--blackTernary);
+  /*line-height: 16px;*/
+}
+
+.life_img{
+
+}
+
+.life_img_dead{
+  filter: grayscale(100%);
+}
+
+.text-outline{
+  text-shadow: 0 0 10px #FFF;
+}
+
+#balloon {
+  display: none;
+  position: absolute;
+  padding: 10px;
+  background-color: #ffcc00;
+  color: #333;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* 三角形の吹き出し部分 */
+#balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: #ffcc00 transparent transparent transparent;
+}
+
+/* トリガーボタン */
+#trigger {
+  margin-top: 100px;
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pointer{
+  cursor: pointer;
 }
