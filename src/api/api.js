@@ -80,6 +80,25 @@ class ApiClass{
     return axios.post(baseURL + '/room/next', param);
   }
 
+  SendAction(userId, action, target, day, roomId){
+    let param = {
+      USER_ID: userId,
+      ACTION_ID: action,
+      TARGET: target,
+      DAY: day,
+      ROOM_ID: roomId,
+    }
+    console.log(param)
+    return axios.post(baseURL + '/game/action', param);
+  }
+
+  GetActionLog(roomId){
+    let param = {
+      ROOM_ID: roomId
+    }
+    return axios.get(baseURL + '/game/log', {params: param});
+  }
+
   TruncateAll(){
     return axios.post(baseURL + '/truncate');
   }

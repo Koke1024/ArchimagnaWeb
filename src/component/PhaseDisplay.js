@@ -9,7 +9,6 @@ const PhaseDisplay = ({roomInfo}) => {
   if (!roomInfo) {
     return <></>;
   }
-  console.dir(roomInfo)
   return (
     <>
       <Box

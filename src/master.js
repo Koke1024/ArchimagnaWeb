@@ -6,7 +6,7 @@ import api from "./api/api";
 import {backgroundColors, Box, Button, Text} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
-import {DefaultHP, PhaseInfo, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
+import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
 import {Grid, Paper, Typography} from "@mui/material";
 import PhaseDisplay from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
@@ -14,6 +14,7 @@ import {RoomContext, UsersContext} from "./App";
 export default function Master() {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
+  const [actionLog, setActionLog] = useState([]);
   const nameInputRefs = useRef([]);
   const lifeInputRefs = useRef([]);
   const manaInputRefs = useRef([]);
@@ -24,6 +25,25 @@ export default function Master() {
   const {token} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const [upd, setUpd] = useState(0);
+  const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
+
+  useEffect(() => {
+    var id = setInterval(() => {
+      if(users.length > 0){
+        setUpd(v => v + 1);
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(id);
+    }
+  }, []);
+
+  useEffect(() => {
+    getActionLog();
+    console.dir(nameInputRefs.current)
+  }, [upd])
 
   const toggleTeamOrder = () => {
     setTeamOrder(v => !v);
@@ -52,6 +72,23 @@ export default function Master() {
     })
   }, [roomInfo]);
 
+  const getActionLog = () => {
+    if(!roomInfo.ROOM_ID){
+      console.log("no room id");
+      return;
+    }
+    api.GetActionLog(roomInfo.ROOM_ID).then(res => {
+      console.log(res.data)
+      setActionLog(res.data);
+    })
+  }
+
+  const handleInputChange = (index, value) => {
+    const newPlayerNames = [...playerNames];
+    newPlayerNames[index] = value;
+    setPlayerNames(newPlayerNames);
+  };
+
   function InputPlayerNames() {
     return (
       <Box p={"md"}>
@@ -60,9 +97,11 @@ export default function Master() {
             <div key={"name_input_" + index}>
               <label>
                 <input
+                  key={"name_input_text_" + index}
                   ref={(el) => (nameInputRefs.current[index] = el)}
-                  // inputRef={(el) => (nameInputRefs.current[index] = el)}
+                  // onBlur={(e) => handleInputChange(index, e.target.value)}
                   placeholder={`Player ${index + 1}`}
+                  // value={playerNames[index]}
                   type="text"
                   style={{width: '200px', margin: '10px'}}
                   required
@@ -83,7 +122,7 @@ export default function Master() {
         <Button m={"xs"} onClick={() => api.CreateRoom().then(r => {
           navigate("/gm/" + r.data.TOKEN);
           // setNewURL("/gm/" + r.data.TOKEN)
-        })}>新規ゲームを開始する
+        })}>新規ルームの作成
         </Button>}
     </div>
   }
@@ -107,11 +146,17 @@ export default function Master() {
       {token ?
         <>
           <div style={{margin: "10px"}}>URLを紛失しないようにしてください。</div>
+          <div>GM用URL</div>
           <input onClick={CopyUrl} style={{margin: "auto", width: "100%", cursor: 'pointer'}} readOnly={true}
                  type={"text"}
                  value={fullPath}></input>
         </> : ''}
     </header>
+  }
+
+  const openPlayerPage = (user_id, token) => {
+    console.log(`/${roomInfo.ROOM_ID}/${user_id}/${token}`)
+    navigate(`/${roomInfo.ROOM_ID}/${user_id}/${token}`);
   }
 
   function RegisterUsers() {
@@ -142,16 +187,11 @@ export default function Master() {
     const [user,] = useState(props.player);
     var index = props.index;
 
-    const openPlayerPage = (token) => {
-      navigate(`/${roomInfo.ROOM_ID}/${user.USER_ID}/${token}`);
-    }
-
-    return <Grid key={user.USER_ID} item xs={6} className={"Square"}>
+    return <Grid key={"player_info_" + user.USER_ID} container className={"Square"}>
       {/*名前*/}
       <Grid item xs={12} className={"Item"}>
-        <Typography onClick={() => openPlayerPage(user.TOKEN)}>※</Typography>
         {user.ROLE &&
-          (<div key={user.USER_ID}>
+          (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}><Typography variant={"h6"} color={"black"}
                                                                          className={"text-outline"}>［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
           </div>)}
@@ -202,9 +242,20 @@ export default function Master() {
 
     const [user,] = useState(props.player);
     var index = props.index;
+    console.dir(actionLog)
 
-    return <Grid key={user.USER_ID} item xs={6} className={"Square"}>
+    return <Grid key={"user_action_log_box_" + user.USER_ID} item xs={6} className={"Square pointer"}
+                 onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}
+    >
       この辺にいろいろ表示
+      {actionLog && actionLog.filter(r => r.USER_ID === user.USER_ID).map(r =>
+        <Box key={"user_action_log_" + r.ACTION_LOG_ID}>
+          <Box>{r.DAY}日目</Box>
+          <Box>{ActionInfo[r.ACTION_ID].Name}</Box>
+          <Box>対象：{r.ACTION_TARGET}</Box>
+          <Box>{r.MEMO}</Box>
+        </Box>
+      )}
     </Grid>;
   }
 
@@ -224,6 +275,10 @@ export default function Master() {
     <Box className="App" style={{width: "700px"}} m={"auto"}>
       <Header/>
       <PhaseDisplay roomInfo={roomInfo}/>
+      {users.length > 0?
+      <Button onClick={OnNextPhase} mx={"auto"} my={"xs"}>
+        {roomInfo.DAY > 0? <>進める</>: <>開始</>}
+      </Button>: ''}
       <Box style={{
         display: "flex",
         flexDirection: "row",
@@ -240,11 +295,6 @@ export default function Master() {
               })
             })}>ロールの自動割り当て</Button>
           </>)}
-        <Box mb={"md"} sx={{"margin": "auto"}}>
-          <Button onClick={OnNextPhase}>
-            進める
-          </Button>
-        </Box>
         {users.length > 0 ?
           (
             <Grid container spacing={2} className={"Square"}>
@@ -260,10 +310,10 @@ export default function Master() {
                   return (a.USER_ID - b.USER_ID);
                 }
                 return (a.TEAM - b.TEAM) * 10 + (a.ROLE - b.ROLE);
-              }).map((r, index) => (<>
+              }).map((r, index) => (<Grid key={"user_message_" + r.USER_ID} item xs={6} spacing={0}>
                   <PlayerInformation player={users[index]} index={index}/>
                   <PlayerRequest player={users[index]} index={index}/>
-                </>
+                </Grid>
               ))}
             </Grid>
           ) :
