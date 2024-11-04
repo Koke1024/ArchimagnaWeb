@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import api from "./api/api";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {ActionInfo, DefaultHP, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
@@ -9,7 +9,7 @@ import {
   Grid,
   Input,
   InputLabel,
-  ListItemText,
+  ListItemText, Menu,
   Typography
 } from "@mui/material";
 // import {Box, Button, Input, Select} from "dracula-ui";
@@ -17,7 +17,7 @@ import PhaseDisplay from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 import img_life from "./img/life.png";
 import {Box, Button} from "dracula-ui";
-import {CustomSelect, CustomMenuItem, CustomListItemText} from "./component/Design";
+import {CustomMenu, CustomMenuItem, CustomListItemText} from "./component/Design";
 
 function Player() {
   const {users, setUsers} = useContext(UsersContext);
@@ -29,7 +29,7 @@ function Player() {
   const [actionLog, setActionLog] = useState([]);
   const [actionValue, setActionValue] = useState(0);
   const [inputAction, setInputAction] = useState(0);
-  const [selectedTargets, setSelectedTargets] = useState([]);
+  const selectedTargets = useRef([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -114,41 +114,84 @@ function Player() {
   }
 
   const MultiSelectTarget = () => {
-    const handleChange = (event) => {
-      setSelectedTargets(event.target.value); // 複数の値が配列で渡される
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [displayTargets, setDisplayTargets] = useState([]);
+    console.log(anchorEl)
+
+    const handleChange = (value) => {
+      let prevValues = selectedTargets.current;
+        if (selectedTargets.current.includes(value)) {
+          selectedTargets.current = prevValues.filter((item) => item !== value);
+        } else {
+          selectedTargets.current = [...prevValues, value];
+        }
+      setDisplayTargets(selectedTargets.current);
+    };
+
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+
+    const handleClose = () => {
+      setAnchorEl(null);
     };
 
     return (
-      <FormControl variant="outlined" style={{ minWidth: 200 }}>
-        <CustomSelect
-          labelId="multi-select-label"
-          multiple
-          value={selectedTargets}
-          onChange={handleChange}
-          renderValue={selected => selected.join(',')} // 選択された値をコンマ区切りで表示
-          label="複数選択"
-          variant={"filled"}
-        >
+      <>
+        <Button variant="outlined" onClick={handleClick}>
+          {selectedTargets.current.length > 0 ? selectedTargets.current.join(', ') : '複数選択'}
+        </Button>
+        <br/>
+
+        <CustomMenu
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={event => {
+              event.stopPropagation();
+              handleClose()
+            }}
+
+          >
           {users && users.map(user => (
-            <CustomMenuItem key={"user_select_" + user.USER_NAME} value={user.USER_NAME}>
-              <Checkbox checked={selectedTargets.indexOf(user.USER_NAME) > -1} />
+            <CustomMenuItem key={"user_select_" + user.USER_ID} value={user.USER_NAME}
+                            onClick={(event) => {
+                              // event.stopPropagation();
+                              handleChange(user.USER_NAME);
+                            }}
+            >
+              <Checkbox checked={selectedTargets.current.indexOf(user.USER_NAME) > -1} />
               <CustomListItemText primary={user.USER_NAME} />
             </CustomMenuItem>
           ))}
           {RoleInfo && Object.values(RoleInfo).map(role => (
-            <CustomMenuItem key={"role_select_" + role} value={role}>
-              <Checkbox checked={selectedTargets.indexOf(role) > -1} />
+            <CustomMenuItem key={"role_select_" + role} value={role}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleChange(role);
+                            }}>
+              <Checkbox checked={selectedTargets.current.indexOf(role) > -1} />
               <CustomListItemText primary={role} />
             </CustomMenuItem>
           ))}
-        </CustomSelect >
-      </FormControl>
+        </CustomMenu>
+        {/*</CustomSelect >*/}
+      {/*</FormControl>*/}
+        </>
     );
   };
 
   const PlayerInformation = (props) => {
     const [user,] = useState(props.player);
-    console.dir(user);
+    // console.dir(user);
     var index = props.index;
 
     const openPlayerPage = (token) => {
@@ -267,12 +310,12 @@ function Player() {
             <Grid item xs={12}>
             {(inputAction !== 0) ? <Button onClick={
               () => {
-                api.SendAction(myInfo.USER_ID, inputAction, selectedTargets, roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
+                api.SendAction(myInfo.USER_ID, inputAction, selectedTargets.current, roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
                   setActionLog([])
                 })
               }
             }>
-              {TargetSelectFormat(selectedTargets)}
+              {TargetSelectFormat(selectedTargets.current)}
             </Button> : <>{inputAction}</>}
             </Grid>
           </> : ''

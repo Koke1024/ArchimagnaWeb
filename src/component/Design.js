@@ -1,4 +1,4 @@
-import {ListItemText, MenuItem, Select, styled} from "@mui/material";
+import {ListItemText, Menu, MenuItem, Select, styled} from "@mui/material";
 
 export const CustomSelect = styled(Select)({
   color: '#21222c', // 文字色
@@ -28,9 +28,19 @@ export const CustomSelect = styled(Select)({
 
 // カスタムスタイルのMenuItemコンポーネント
 export const CustomMenuItem = styled(MenuItem)({
+  height: '25px',
   color: '#21222c', // ドロップダウンの文字色
   '&:hover': {
     backgroundColor: '#a7abbe', // ホバー時の背景色
+  },
+});
+
+// カスタムスタイルのMenuItemコンポーネント
+export const CustomMenu = styled(Menu)({
+  color: '#21222c', // ドロップダウンの文字色
+  position: 'absolute',
+  '&:hover': {
+    // backgroundColor: '#a7abbe', // ホバー時の背景色
   },
 });
 
