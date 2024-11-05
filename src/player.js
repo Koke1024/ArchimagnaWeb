@@ -2,7 +2,7 @@ import './App.css';
 import React, {useContext, useEffect, useRef, useState} from "react";
 import api from "./api/api";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {ActionInfo, DefaultHP, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
+import {ActionInfo, DefaultHP, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
 import {
   Checkbox,
   FormControl,
@@ -12,12 +12,12 @@ import {
   ListItemText, Menu,
   Typography
 } from "@mui/material";
-// import {Box, Button, Input, Select} from "dracula-ui";
 import PhaseDisplay from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 import img_life from "./img/life.png";
 import {Box, Button} from "dracula-ui";
-import {CustomMenu, CustomMenuItem, CustomListItemText} from "./component/Design";
+import {CustomInput, CustomMenu, CustomMenuItem, CustomListItemText} from "./component/Design";
+import ConfirmDialog from './component/Dialog';
 
 function Player() {
   const {users, setUsers} = useContext(UsersContext);
@@ -31,6 +31,20 @@ function Player() {
   const [inputAction, setInputAction] = useState(0);
   const selectedTargets = useRef([]);
   const location = useLocation();
+  const [openDialog, setOpenDialog] = useState(false)
+
+  const handleOpen = () => {
+    setOpenDialog(true); // ダイアログを開く
+  };
+
+  const handleClose = (cb) => {
+    setOpenDialog(false); // ダイアログを閉じる
+  };
+
+  const handleConfirm = (cb) => {
+    cb();
+    setOpenDialog(false); // 確認後にダイアログを閉じる
+  };
 
   useEffect(() => {
     var id = setInterval(() => {
@@ -73,17 +87,6 @@ function Player() {
     })
   }, [roomInfo]);
 
-  const TargetSelectFormat = (selected) => {
-    switch(inputAction){
-      case 7:
-        return `裁定「${selected[0] ?? '?'}が${selected[1] ?? '?'}に戦闘を行った」`;
-      case 5:
-        return (ActionInfo[inputAction].Target? `${selected[0] ?? '?'}に対して`: '') + `魔力を${actionValue}消費して${ActionInfo[inputAction].Name}を行う`;
-      default:
-        return (ActionInfo[inputAction].Target? `${selected[0] ?? '?'}に対して`: '') + `${ActionInfo[inputAction].Name}を行う`;
-    }
-  }
-
 
   function Header() {
     const fullPath = `${window.location.origin}/gm/${roomInfo.TOKEN}/`;
@@ -116,15 +119,14 @@ function Player() {
   const MultiSelectTarget = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [displayTargets, setDisplayTargets] = useState([]);
-    console.log(anchorEl)
 
     const handleChange = (value) => {
       let prevValues = selectedTargets.current;
-        if (selectedTargets.current.includes(value)) {
-          selectedTargets.current = prevValues.filter((item) => item !== value);
-        } else {
-          selectedTargets.current = [...prevValues, value];
-        }
+      if (selectedTargets.current.includes(value)) {
+        selectedTargets.current = prevValues.filter((item) => item !== value);
+      } else {
+        selectedTargets.current = [...prevValues, value];
+      }
       setDisplayTargets(selectedTargets.current);
     };
 
@@ -135,32 +137,34 @@ function Player() {
 
     const handleClose = () => {
       setAnchorEl(null);
+      setUpd(v => v + 1);
     };
 
     return (
       <>
-        <Button variant="outlined" onClick={handleClick}>
-          {selectedTargets.current.length > 0 ? selectedTargets.current.join(', ') : '複数選択'}
+        対象選択　<Button variant="normal"
+                onClick={handleClick}>
+          {selectedTargets.current.length > 0 ? selectedTargets.current.join(', ') : '対象選択'}
         </Button>
         <br/>
 
         <CustomMenu
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
-            }}
-            open={Boolean(anchorEl)}
-            onClose={event => {
-              event.stopPropagation();
-              handleClose()
-            }}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          open={Boolean(anchorEl)}
+          onClose={event => {
+            event.stopPropagation();
+            handleClose()
+          }}
 
-          >
+        >
           {users && users.map(user => (
             <CustomMenuItem key={"user_select_" + user.USER_ID} value={user.USER_NAME}
                             onClick={(event) => {
@@ -168,8 +172,8 @@ function Player() {
                               handleChange(user.USER_NAME);
                             }}
             >
-              <Checkbox checked={selectedTargets.current.indexOf(user.USER_NAME) > -1} />
-              <CustomListItemText primary={user.USER_NAME} />
+              <Checkbox checked={selectedTargets.current.indexOf(user.USER_NAME) > -1}/>
+              <CustomListItemText primary={user.USER_NAME}/>
             </CustomMenuItem>
           ))}
           {RoleInfo && Object.values(RoleInfo).map(role => (
@@ -178,14 +182,14 @@ function Player() {
                               event.stopPropagation();
                               handleChange(role);
                             }}>
-              <Checkbox checked={selectedTargets.current.indexOf(role) > -1} />
-              <CustomListItemText primary={role} />
+              <Checkbox checked={selectedTargets.current.indexOf(role) > -1}/>
+              <CustomListItemText primary={role}/>
             </CustomMenuItem>
           ))}
         </CustomMenu>
         {/*</CustomSelect >*/}
-      {/*</FormControl>*/}
-        </>
+        {/*</FormControl>*/}
+      </>
     );
   };
 
@@ -214,14 +218,25 @@ function Player() {
                                                                   key={`life_${user.USER_ID}_${lifeIndex}`}
                                                                   className={(lifeIndex < user.HP ? "life_img" : "life_img_dead")}/>)}</Box>
         <Box mb={"md"}>
-          <>魔力</>
-          {user.MANA}
+          魔力：{user.MANA}
         </Box></Grid>
     </Grid>
   }
 
   if (!token) {
     return <>no token</>
+  }
+
+  const EnableAction = () => {
+    return Object.entries(ActionInfo).filter(r => {
+      return (r[1].Role.length === 0 || (r[1].Role.find(v => v === myInfo.ROLE)));
+    });
+  }
+
+  const IsActiveAction = (id) => {
+    console.dir(ActionInfo[id])
+    console.dir(ActionInfo[id]["Phase"])
+    return (ActionInfo[id]["Phase"].includes(roomInfo.PHASE));
   }
 
   return (
@@ -273,34 +288,21 @@ function Player() {
           <><Grid item xs={3}></Grid>
             <Grid item xs={6} md={6}>
               <Typography>
-                現在可能なアクション
+                行うアクション
               </Typography>
             </Grid>
             <Grid item xs={3}></Grid>
-            <Grid item xs={12}>
-              <MultiSelectTarget/>
-            </Grid>
-            <Grid item xs={12}>
-              <Input type={"number"} defaultValue={actionValue} onChange={(e) => {
-                setActionValue(e.target.value)
-              }}></Input>
-            </Grid>
-            {Object.entries(ActionInfo).filter(r => {
-              return (r[1].Role.length === 0 || r[1].Role.find(v => v === roomInfo.PHASE)) && (r[1].Role.find(v => v === myInfo.ROLE));
-            }).map(r => {
-              return <Grid item key={"action_" + r[0]} xs={4}>
-                <Button onClick={() => {
-                  console.log("action: " + r[0])
-                  console.log("inputAction: " + inputAction)
-                  console.log("r[1].IDs: " + r[1].ID)
-                  if(inputAction === r[1].ID){
+            {EnableAction().map(r => {
+              return <Grid item key={"action_" + r[0]} xs={2}>
+                <Button
+                  variant={IsActiveAction(r[1].ID)? "normal": "ghost"}
+                  disabled={!IsActiveAction(r[1].ID)}
+                  onClick={() => {
+                  if (inputAction === r[1].ID) {
                     setInputAction(0);
-                  }else {
+                  } else {
                     setInputAction(r[1].ID);
                   }
-                  // api.SendAction(myInfo.USER_ID, r[1].ID, actionTarget, roomInfo.DAY, roomInfo.roomId).then(res => {
-                  //   // setActionLog([])
-                  // })
                 }
                 }>
                   <Typography>{r[1].Name}</Typography>
@@ -308,15 +310,41 @@ function Player() {
               </Grid>
             })}
             <Grid item xs={12}>
-            {(inputAction !== 0) ? <Button onClick={
-              () => {
-                api.SendAction(myInfo.USER_ID, inputAction, selectedTargets.current, roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
-                  setActionLog([])
-                })
-              }
-            }>
-              {TargetSelectFormat(selectedTargets.current)}
-            </Button> : <>{inputAction}</>}
+              <MultiSelectTarget/>
+            </Grid>
+            {inputAction === 5 ?
+              <Grid item xs={12}>
+                消費魔力：
+                <CustomInput
+                  type={"number"} defaultValue={actionValue} onChange={(e) => {
+                  setActionValue(e.target.value)
+                }}></CustomInput>
+              </Grid> : <></>
+            }
+            <Grid item xs={12}>
+              {(inputAction !== 0) ?
+                <>
+                  <Button variant="contained" color="red" onClick={handleOpen}>
+                    {TargetSelectFormat(selectedTargets.current, inputAction, actionValue)}
+                  </Button>
+                  <ConfirmDialog
+                    open={openDialog}
+                    onClose={handleClose}
+                    title={"以下のアクションを実行しますか？"}
+                    onConfirm={() => {
+                      handleConfirm(() => {
+                        if(inputAction === 5){
+                          selectedTargets.current[1] = actionValue;
+                        }
+                        api.SendAction(myInfo.USER_ID, inputAction, JSON.stringify(selectedTargets.current), roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
+                          setActionLog([])
+                        })
+                      })
+                    }}
+                    message={<><p></p><p>{TargetSelectFormat(selectedTargets.current, inputAction, actionValue)}</p></>}
+                  />
+                </>
+                : <></>}
             </Grid>
           </> : ''
         }

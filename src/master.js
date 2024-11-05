@@ -6,7 +6,7 @@ import api from "./api/api";
 import {backgroundColors, Box, Button, Text} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
-import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
+import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
 import {Grid, Paper, Typography} from "@mui/material";
 import PhaseDisplay from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
@@ -33,7 +33,9 @@ export default function Master() {
       if(users.length > 0){
         setUpd(v => v + 1);
       }
-    }, 5000);
+    }, 20000);
+
+    getActionLog();
 
     return () => {
       clearInterval(id);
@@ -78,6 +80,7 @@ export default function Master() {
       return;
     }
     api.GetActionLog(roomInfo.ROOM_ID).then(res => {
+      console.log("GetActionLog")
       console.log(res.data)
       setActionLog(res.data);
     })
@@ -193,6 +196,7 @@ export default function Master() {
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}><Typography variant={"h6"} color={"black"}
+                                                                         onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}
                                                                          className={"text-outline"}>［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
           </div>)}
         {!user.ROLE &&
@@ -234,29 +238,32 @@ export default function Master() {
               color: 'var(--blackSecondary)'
             }}
           />
-        </Box></Grid>
+        </Box>
+      </Grid>
+      <Grid item xs={12}>
+        <Box>
+          <PlayerRequest player={users[index]} index={index}/>
+        </Box>
+      </Grid>
     </Grid>
   }
 
   const PlayerRequest = (props) => {
-
     const [user,] = useState(props.player);
     var index = props.index;
-    console.dir(actionLog)
 
-    return <Grid key={"user_action_log_box_" + user.USER_ID} item xs={6} className={"Square pointer"}
-                 onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}
+    return (<Box key={"user_action_log_box_" + user.USER_ID} className={"pointer"}
     >
-      この辺にいろいろ表示
-      {actionLog && actionLog.filter(r => r.USER_ID === user.USER_ID).map(r =>
-        <Box key={"user_action_log_" + r.ACTION_LOG_ID}>
-          <Box>{r.DAY}日目</Box>
-          <Box>{ActionInfo[r.ACTION_ID].Name}</Box>
-          <Box>対象：{r.ACTION_TARGET}</Box>
-          <Box>{r.MEMO}</Box>
-        </Box>
+      行動ログ
+      {actionLog && actionLog.filter(r => r.USER_ID === user.USER_ID).map(r => {
+          var args = JSON.parse(r.ACTION_TARGET);
+          return (<Grid key={"user_action_log_" + r.ACTION_LOG_ID} item xs={12} >
+            <Box>{r.DAY}日目</Box>
+            <Box>{TargetSelectFormat(args, r.ACTION_ID, args[1])}</Box>
+          </Grid>)
+        }
       )}
-    </Grid>;
+    </Box>)
   }
 
   const OnNextPhase = () => {
@@ -298,7 +305,10 @@ export default function Master() {
         {users.length > 0 ?
           (
             <Grid container spacing={2} className={"Square"}>
-              <Grid item xs={9}>
+              <Grid item xs={6}>
+              </Grid>
+              <Grid item xs={3}>
+                <Button onClick={getActionLog}>ログの更新</Button>
               </Grid>
               <Grid item xs={3}>
                 <Button onClick={toggleTeamOrder}>
@@ -310,9 +320,8 @@ export default function Master() {
                   return (a.USER_ID - b.USER_ID);
                 }
                 return (a.TEAM - b.TEAM) * 10 + (a.ROLE - b.ROLE);
-              }).map((r, index) => (<Grid key={"user_message_" + r.USER_ID} item xs={6} spacing={0}>
+              }).map((r, index) => (<Grid key={"user_message_" + r.USER_ID} item xs={6}>
                   <PlayerInformation player={users[index]} index={index}/>
-                  <PlayerRequest player={users[index]} index={index}/>
                 </Grid>
               ))}
             </Grid>

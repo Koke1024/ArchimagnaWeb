@@ -1,4 +1,5 @@
-import {ListItemText, Menu, MenuItem, Select, styled} from "@mui/material";
+import {Input, ListItemText, Menu, MenuItem, Select, styled} from "@mui/material";
+import {Button} from "dracula-ui";
 
 export const CustomSelect = styled(Select)({
   color: '#21222c', // 文字色
@@ -50,4 +51,12 @@ export const CustomListItemText = styled(ListItemText)({
   '&:hover': {
     // backgroundColor: '#a7abbe', // ホバー時の背景色
   },
+});
+
+// カスタムスタイルのMenuItemコンポーネント
+export const CustomInput = styled(Input)({
+  height: '30px',
+  padding: '4px',
+  backgroundColor: '#a7abbe', // ホバー時の背景色
+  borderRadius: '10px',
 });
