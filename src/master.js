@@ -7,21 +7,20 @@ import {backgroundColors, Box, Button, Text} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
 import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
-import {Grid, Paper, Typography} from "@mui/material";
-import PhaseDisplay from "./component/PhaseDisplay";
+import {Grid, Input, Paper, Typography} from "@mui/material";
+import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 
 export default function Master() {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
+  const [usersLife, setUsersLife] = useState(Array(8).fill(0));
   const [actionLog, setActionLog] = useState([]);
   const nameInputRefs = useRef([]);
-  const lifeInputRefs = useRef([]);
-  const manaInputRefs = useRef([]);
-  const lifeAddInputRefs = useRef([]);
   const manaAddInputRefs = useRef([]);
   const [isTeamOrder, setTeamOrder] = useState(false);
   const [newURL, setNewURL] = useState("");
+  const rewritten = useRef(false);
   const {token} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,17 +28,17 @@ export default function Master() {
   const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
 
   useEffect(() => {
-    var id = setInterval(() => {
-      if(users.length > 0){
-        setUpd(v => v + 1);
-      }
-    }, 20000);
+    // var id = setInterval(() => {
+    //   if(users.length > 0){
+    //     setUpd(v => v + 1);
+    //   }
+    // }, 20000);
 
     getActionLog();
 
-    return () => {
-      clearInterval(id);
-    }
+    // return () => {
+    //   clearInterval(id);
+    // }
   }, []);
 
   useEffect(() => {
@@ -75,14 +74,32 @@ export default function Master() {
   }, [roomInfo]);
 
   const getActionLog = () => {
-    if(!roomInfo.ROOM_ID){
+    if (!roomInfo.ROOM_ID) {
       console.log("no room id");
       return;
     }
     api.GetActionLog(roomInfo.ROOM_ID).then(res => {
-      console.log("GetActionLog")
-      console.log(res.data)
       setActionLog(res.data);
+    })
+  }
+
+  const updateUserInfo = () => {
+    if (!roomInfo.ROOM_ID) {
+      console.log("no room id");
+      return;
+    }
+    var _users = users;
+    for (let i = 0; i < _users.length; ++i) {
+      _users[i].MANA = +manaAddInputRefs.current[i].value ?? 0;
+    }
+    for (let i = 0; i < _users.length; ++i) {
+      _users[i].HP = usersLife[i] ?? 0;
+    }
+    api.UpdateUserInfo(roomInfo.ROOM_ID, _users).then(res => {
+      setUsersLife(Array(8).fill(0));
+      setUsers(res.data)
+      getActionLog();
+      rewritten.current = false;
     })
   }
 
@@ -169,7 +186,6 @@ export default function Master() {
     const newNames = [];
     console.log(nameInputRefs)
     for (let i = 0; i < nameInputRefs.current.length; ++i) {
-      console.log(nameInputRefs.current[i])
       newNames[i] = nameInputRefs.current[i].value;
       if (newNames[i] === "") {
         newNames[i] = "プレイヤー" + (i);
@@ -190,80 +206,63 @@ export default function Master() {
     const [user,] = useState(props.player);
     var index = props.index;
 
-    return <Grid key={"player_info_" + user.USER_ID} container className={"Square"}>
+    return <Grid key={"player_info_" + user.USER_ID} container spacing={"xxs"} className={"Square"}>
       {/*名前*/}
       <Grid item xs={12} className={"Item"}>
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}><Typography variant={"h6"} color={"black"}
-                                                                         onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}
+                                                                         // onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}
                                                                          className={"text-outline"}>［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
           </div>)}
         {!user.ROLE &&
           (<Typography fontSize={"x-large"}>{index + 1}：{user.USER_NAME}</Typography>)}
-        <Box>HP:
-          {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"30px"}
-                                                                  style={{marginTop: "0px"}}
-                                                                  key={`life_${user.USER_ID}_${lifeIndex}`}
-                                                                  className={(lifeIndex < user.HP ? "life_img" : "life_img_dead") + " pointer"}
-                                                                  onClick={() => {
-                                                                    if (lifeIndex < user.HP) {
-                                                                      users[index].HP -= 1;
-                                                                    } else {
-                                                                      users[index].HP += 1;
-                                                                    }
-                                                                    setUsers(users.filter(v => true));
-                                                                    console.log(users)
-                                                                  }}/>)}</Box>
-        <Box mb={"md"}>
-          <>魔力</>
-          <input
-            ref={(el) => (manaInputRefs.current[index] = el)}
-            defaultValue={user.MANA}
-            type="number"
-            style={{
-              fontsize: "sm",
-              width: '50px',
-              backgroundColor: 'var(--blackTernary)',
-              color: 'var(--blackSecondary)'
-            }}/>+
-          <input
-            ref={(el) => (manaAddInputRefs.current[index] = el)}
-            defaultValue={0}
-            type="number"
-            style={{
-              fontsize: "sm",
-              width: '50px',
-              backgroundColor: 'var(--blackTernary)',
-              color: 'var(--blackSecondary)'
-            }}
-          />
+        <Box className={"drac-d-flex"}>
+          <Box className={"drac-text-left"} p={"xs"}>HP :
+            {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"30px"}
+                                                                    style={{marginTop: "0px", marginLeft: "10px"}}
+                                                                    key={`life_${user.USER_ID}_${lifeIndex}`}
+                                                                    className={(lifeIndex < (user.HP + usersLife[index]) ? "life_img" : "life_img_dead") + " pointer"}
+                                                                    onClick={() => {
+                                                                      if (lifeIndex < (user.HP + usersLife[index])) {
+                                                                        usersLife[index] -= 1;
+                                                                      } else {
+                                                                        usersLife[index] += 1;
+                                                                      }
+                                                                      setUsersLife(usersLife.filter(_ => true));
+                                                                      rewritten.current = true;
+                                                                      console.log(users)
+                                                                    }}/>)}
+
+            　魔力 ： <Typography className={"drac-d-inline"} color={"white"} fontSize={"x-large"}>{user.MANA}</Typography> +　
+            <input
+              ref={(el) => (manaAddInputRefs.current[index] = el)}
+              defaultValue={manaAddInputRefs.current[index]}
+              type="number"
+              style={{
+                fontSize: "x-large",
+                width: '80px',
+                padding: '4px',
+                backgroundColor: 'var(--blackTernary)',
+                color: 'var(--blackSecondary)',
+                borderRadius: '10%'
+              }}
+              onBlur={event => {
+                console.log(+event.target.value)
+                if(+(event.target.value) !== 0){
+                  rewritten.current = true;
+                }
+              }}
+            />
+          </Box>
         </Box>
       </Grid>
       <Grid item xs={12}>
         <Box>
-          <PlayerRequest player={users[index]} index={index}/>
+          <PlayerLog player={users[index]} log={actionLog.filter(v => v.USER_ID === user.USER_ID)}/>
         </Box>
       </Grid>
     </Grid>
-  }
-
-  const PlayerRequest = (props) => {
-    const [user,] = useState(props.player);
-    var index = props.index;
-
-    return (<Box key={"user_action_log_box_" + user.USER_ID} className={"pointer"}
-    >
-      行動ログ
-      {actionLog && actionLog.filter(r => r.USER_ID === user.USER_ID).map(r => {
-          var args = JSON.parse(r.ACTION_TARGET);
-          return (<Grid key={"user_action_log_" + r.ACTION_LOG_ID} item xs={12} >
-            <Box>{r.DAY}日目</Box>
-            <Box>{TargetSelectFormat(args, r.ACTION_ID, args[1])}</Box>
-          </Grid>)
-        }
-      )}
-    </Box>)
   }
 
   const OnNextPhase = () => {
@@ -281,18 +280,39 @@ export default function Master() {
   return (
     <Box className="App" style={{width: "700px"}} m={"auto"}>
       <Header/>
+
+      <Grid container className={"Controller"}>
+        <Grid item xs={2}></Grid>
+        <Grid item xs={2}>
+          <Button onClick={toggleTeamOrder}>
+            並び順変更
+          </Button>
+        </Grid>
+        <Grid item xs={2}><Button
+          disabled={!rewritten.current}
+          onClick={() => {
+            updateUserInfo();
+          }}>HPと魔力を更新</Button>
+        </Grid>
+        <Grid item xs={2}>
+          <Button onClick={getActionLog}>ログを更新</Button>
+        </Grid>
+        <Grid item xs={2}>
+          {users.length > 0 ?
+            <Button onClick={OnNextPhase} mx={"auto"}>
+              {roomInfo.DAY > 0 ? <>フェイズを進める</> : <>開始</>}
+            </Button> : ''}
+        </Grid>
+        <Grid item xs={2}></Grid>
+      </Grid>
       <PhaseDisplay roomInfo={roomInfo}/>
-      {users.length > 0?
-      <Button onClick={OnNextPhase} mx={"auto"} my={"xs"}>
-        {roomInfo.DAY > 0? <>進める</>: <>開始</>}
-      </Button>: ''}
       <Box style={{
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
         width: "800px",
         resize: "both",
-        margin: "auto"
+        margin: "30px auto"
       }}>
         {users.length > 0 && users[0].ROLE === null &&
           (<>
@@ -304,17 +324,7 @@ export default function Master() {
           </>)}
         {users.length > 0 ?
           (
-            <Grid container spacing={2} className={"Square"}>
-              <Grid item xs={6}>
-              </Grid>
-              <Grid item xs={3}>
-                <Button onClick={getActionLog}>ログの更新</Button>
-              </Grid>
-              <Grid item xs={3}>
-                <Button onClick={toggleTeamOrder}>
-                  並び順変更
-                </Button>
-              </Grid>
+            <Grid container spacing={2} className={"Square Players"}>
               {users.sort((a, b) => {
                 if (!isTeamOrder) {
                   return (a.USER_ID - b.USER_ID);
@@ -331,12 +341,12 @@ export default function Master() {
             <Button m={"xs"} onClick={RegisterUsers}>登録
             </Button>
           </form>}</Box>
-      <div>
-        <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>
-      </div>
+      {/*<div>*/}
+      {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
+      {/*</div>*/}
+      <Box m={"lg"}> </Box>
     </Box>
-  )
-    ;
+  );
 }
 
 

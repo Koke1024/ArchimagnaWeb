@@ -8,12 +8,12 @@ class ApiClass{
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
     axios.interceptors.request.use(request => {
-      console.log('Starting Request: ', request)
+      // console.log('Starting Request: ', request)
       return request
     })
 
     axios.interceptors.response.use(response => {
-      console.log('Response: ', response)
+      // console.log('Response: ', response)
       return response
     })
 
@@ -97,6 +97,21 @@ class ApiClass{
       ROOM_ID: roomId
     }
     return axios.get(baseURL + '/game/log', {params: param});
+  }
+
+  UpdateUserInfo(roomId, users){
+    let usersList = {};
+    for(let i = 0; i < users.length; i++){
+      usersList[i] = {};
+      usersList[i].USER_ID = users[i].USER_ID;
+      usersList[i].HP = users[i].HP;
+      usersList[i].MANA = users[i].MANA;
+    }
+    let param = {
+      ROOM_ID: roomId,
+      USERS: usersList,
+    }
+    return axios.post(baseURL + '/user/update', param);
   }
 
   TruncateAll(){

@@ -56,10 +56,37 @@ input{
   box-sizing: border-box;
   outline: none;
   transition: all .3s ease-in-out;
-  padding: 10px;
-  margin: 10px;
+  padding: 0;
   color: var(--blackSecondary);
   width: 50%;
+}
+
+.Players{
+  height: fit-content(100%);
+}
+
+.Log{
+  background: var(--whiteLight);
+  border: .3rem solid transparent;
+  border-color:  var(--blackSecondary);
+  border-radius: var(--rounded-lg);
+  box-sizing: border-box;
+  outline: none;
+  transition: all .3s ease-in-out;
+  padding: 5px;
+  color: var(--blackSecondary);
+}
+
+.Controller{
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: var(--blackSecondary);
+  border-top: .3rem solid transparent;
+  border-color:  var(--blackSecondary);
 }
 
 .Phase{

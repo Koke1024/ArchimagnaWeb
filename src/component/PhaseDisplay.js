@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Box} from "dracula-ui";
 import {Grid, Typography} from "@mui/material";
-import {PhaseInfo} from "../api/ArchiMagnaDefine";
+import {PhaseInfo, TargetSelectFormat} from "../api/ArchiMagnaDefine";
 import {minWidth} from "@mui/system";  // 必要ならPropTypesを追加
 
 const PhaseDisplay = ({roomInfo}) => {
@@ -41,5 +41,26 @@ const PhaseDisplay = ({roomInfo}) => {
 PhaseDisplay.propTypes = {
   roomInfo: PropTypes.object.isRequired,
 };
+
+
+export const PlayerLog = (props) => {
+  const [user, ] = useState(props.player);
+  const [log, ] = useState(props.log)
+
+  if(!log || log.length === 0){
+    return <></>;
+  }
+
+  return (<Box key={"user_action_log_box_" + user.USER_ID} className={"Log"}
+  >
+    {log && log.map(r => {
+        var args = JSON.parse(r.ACTION_TARGET);
+        return (<Grid key={"user_action_log_" + r.ACTION_LOG_ID} item xs={12} className={"drac-text-left"}>
+          <Box>{r.DAY}日目：{TargetSelectFormat(args, r.ACTION_ID, args[1])}</Box>
+        </Grid>)
+      }
+    )}
+  </Box>)
+}
 
 export default PhaseDisplay;

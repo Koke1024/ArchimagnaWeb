@@ -24,7 +24,6 @@ function App() {
           <Route path="/gm" element={<Master/>}/>
           <Route path="/gm/:token" element={<Master/>}/>
         </Routes>
-        <Link to='/'>Back To Top</Link>
       </BrowserRouter>
       </RoomContext.Provider>
       </UsersContext.Provider>

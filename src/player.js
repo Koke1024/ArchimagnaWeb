@@ -9,7 +9,7 @@ import {
   Grid,
   Input,
   InputLabel,
-  ListItemText, Menu,
+  ListItemText, Menu, Paper,
   Typography
 } from "@mui/material";
 import PhaseDisplay from "./component/PhaseDisplay";
@@ -92,10 +92,6 @@ function Player() {
     const fullPath = `${window.location.origin}/gm/${roomInfo.TOKEN}/`;
 
     function CopyUrl() {
-      console.log(window.location.origin)
-      console.log(location.pathname)
-      console.log(location.search)
-      console.log(location.hash)
       navigator.clipboard.writeText(fullPath)
         .then(() => {
           console.log("Copied")
@@ -217,7 +213,7 @@ function Player() {
                                                                   style={{marginTop: "0px"}}
                                                                   key={`life_${user.USER_ID}_${lifeIndex}`}
                                                                   className={(lifeIndex < user.HP ? "life_img" : "life_img_dead")}/>)}</Box>
-        <Box mb={"md"}>
+        <Box>
           魔力：{user.MANA}
         </Box></Grid>
     </Grid>
@@ -270,19 +266,19 @@ function Player() {
         {/*})}>送信*/}
         {/*</button>*/}
 
-
-        <Grid container spacing={2}>
+        <Grid item xs={12}>
+        <Button onClick={() => setUpd(v => v + 1)}>更新</Button>
+        </Grid>
 
           <Grid item xs={12}><Typography>プレイヤー：</Typography></Grid>
-          <br/>
           {users && users.map(user => {
             return <Grid xs={3} item key={'id_' + user.USER_ID}>
-              <Typography color={(user.HP > 0) ? "white" : "red"}>
+              <Paper><Typography color={(user.HP > 0) ? "black" : "red"}>
                 ［{user.USER_NAME}］
               </Typography>
+              </Paper>
             </Grid>
           })}
-        </Grid>
 
         {myInfo ?
           <><Grid item xs={3}></Grid>
@@ -299,7 +295,7 @@ function Player() {
                   disabled={!IsActiveAction(r[1].ID)}
                   onClick={() => {
                   if (inputAction === r[1].ID) {
-                    setInputAction(0);
+                    // setInputAction(0);
                   } else {
                     setInputAction(r[1].ID);
                   }
@@ -337,7 +333,10 @@ function Player() {
                           selectedTargets.current[1] = actionValue;
                         }
                         api.SendAction(myInfo.USER_ID, inputAction, JSON.stringify(selectedTargets.current), roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
-                          setActionLog([])
+                          setActionLog([]);
+                          setInputAction(0);
+                          selectedTargets.current = [];
+                          setUpd(v => v + 1);
                         })
                       })
                     }}
@@ -349,7 +348,7 @@ function Player() {
           </> : ''
         }
       </Grid>
-      <Header/>
+      {/*<Header/>*/}
     </Box>
   );
 }
