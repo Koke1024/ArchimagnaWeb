@@ -20,11 +20,11 @@ export default function Master() {
   const manaAddInputRefs = useRef([]);
   const [isTeamOrder, setTeamOrder] = useState(false);
   const [newURL, setNewURL] = useState("");
-  const rewritten = useRef(false);
   const {token} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [upd, setUpd] = useState(0);
+  const submitRef = useRef(null);
   const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
 
   useEffect(() => {
@@ -90,7 +90,8 @@ export default function Master() {
     }
     var _users = users;
     for (let i = 0; i < _users.length; ++i) {
-      _users[i].MANA = +manaAddInputRefs.current[i].value ?? 0;
+      console.log(manaAddInputRefs.current[i].value)
+      _users[i].MANA = +(manaAddInputRefs.current[i].value) ?? 0;
     }
     for (let i = 0; i < _users.length; ++i) {
       _users[i].HP = usersLife[i] ?? 0;
@@ -99,7 +100,7 @@ export default function Master() {
       setUsersLife(Array(8).fill(0));
       setUsers(res.data)
       getActionLog();
-      rewritten.current = false;
+      submitRef.current.disabled = true;
     })
   }
 
@@ -211,9 +212,11 @@ export default function Master() {
       <Grid item xs={12} className={"Item"}>
         {user.ROLE &&
           (<div>
-            <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}><Typography variant={"h6"} color={"black"}
-                                                                         // onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}
-                                                                         className={"text-outline"}>［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
+            <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
+              <Typography variant={"h6"} color={"black"}
+                          className={"text-outline"}>
+                <span className={"pointer"} onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}>※</span>
+                ［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
           </div>)}
         {!user.ROLE &&
           (<Typography fontSize={"x-large"}>{index + 1}：{user.USER_NAME}</Typography>)}
@@ -230,8 +233,10 @@ export default function Master() {
                                                                         usersLife[index] += 1;
                                                                       }
                                                                       setUsersLife(usersLife.filter(_ => true));
-                                                                      rewritten.current = true;
-                                                                      console.log(users)
+                                                                      // setRewritten(true);
+
+                                                                      submitRef.current.disabled = false;
+                                                                        console.log(users)
                                                                     }}/>)}
 
             　魔力 ： <Typography className={"drac-d-inline"} color={"white"} fontSize={"x-large"}>{user.MANA}</Typography> +　
@@ -247,10 +252,11 @@ export default function Master() {
                 color: 'var(--blackSecondary)',
                 borderRadius: '10%'
               }}
-              onBlur={event => {
+              onChange={event => {
+                manaAddInputRefs.current[index].value = event.target.value;
                 console.log(+event.target.value)
                 if(+(event.target.value) !== 0){
-                  rewritten.current = true;
+                  submitRef.current.disabled = false;
                 }
               }}
             />
@@ -289,7 +295,7 @@ export default function Master() {
           </Button>
         </Grid>
         <Grid item xs={2}><Button
-          disabled={!rewritten.current}
+          ref={submitRef}
           onClick={() => {
             updateUserInfo();
           }}>HPと魔力を更新</Button>
@@ -341,10 +347,10 @@ export default function Master() {
             <Button m={"xs"} onClick={RegisterUsers}>登録
             </Button>
           </form>}</Box>
-      {/*<div>*/}
-      {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
-      {/*</div>*/}
-      <Box m={"lg"}> </Box>
+      <div>
+        <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>
+      </div>
+      <Box mb={"lg"} style={{marginBottom: "80px"}}></Box>
     </Box>
   );
 }
