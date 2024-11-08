@@ -34,6 +34,14 @@ class ApiClass{
     return axios.get(baseURL + '/user/list', {params: param});
   }
 
+  GetUserNames(roomId){
+    let param = {
+      ROOM_ID: roomId
+    }
+    console.log(param)
+    return axios.get(baseURL + '/user/names', {params: param});
+  }
+
   GetUserInfo(userId, token){
     let param = {
       USER_ID: userId,
@@ -97,6 +105,14 @@ class ApiClass{
       ROOM_ID: roomId
     }
     return axios.get(baseURL + '/game/log', {params: param});
+  }
+
+  GetUserActionLog(roomId, userId){
+    let param = {
+      ROOM_ID: roomId,
+      USER_ID: userId
+    }
+    return axios.get(baseURL + '/game/log/user', {params: param});
   }
 
   UpdateUserInfo(roomId, users){

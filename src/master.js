@@ -28,17 +28,8 @@ export default function Master() {
   const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
 
   useEffect(() => {
-    // var id = setInterval(() => {
-    //   if(users.length > 0){
-    //     setUpd(v => v + 1);
-    //   }
-    // }, 20000);
-
+    submitRef.current.disabled = true;
     getActionLog();
-
-    // return () => {
-    //   clearInterval(id);
-    // }
   }, []);
 
   useEffect(() => {
@@ -347,9 +338,9 @@ export default function Master() {
             <Button m={"xs"} onClick={RegisterUsers}>登録
             </Button>
           </form>}</Box>
-      <div>
-        <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>
-      </div>
+      {/*<div>*/}
+      {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
+      {/*</div>*/}
       <Box mb={"lg"} style={{marginBottom: "80px"}}></Box>
     </Box>
   );
