@@ -204,10 +204,10 @@ export default function Master() {
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
-              <Typography variant={"h6"} color={"black"}
+              <Typography variant={"h6"} color={user.HP > 0? "black": "red"}
                           className={"text-outline"}>
                 <span className={"pointer"} onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}>※</span>
-                ［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
+                ［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}ツイン</Typography></Box>
           </div>)}
         {!user.ROLE &&
           (<Typography fontSize={"x-large"}>{index + 1}：{user.USER_NAME}</Typography>)}

@@ -203,25 +203,26 @@ function Player() {
       navigate(`/${roomInfo.ROOM_ID}/${user.USER_ID}/${token}`);
     }
 
-    return <Grid key={"player_info_" + index} item xs={6} className={"Square"}>
+    return <Grid key={"player_info_" + index} item xs={6} className={"Item"} >
       {/*名前*/}
-      <Grid item xs={12} className={"Item"} pt={"2px"}>
         {user.ROLE &&
           (<div>
-            <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}><Typography variant={"h6"} color={"black"}
-                                                                         className={"text-outline"}>［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}チーム</Typography></Box>
+            <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
+              <Typography color={"black"} className={"text-outline"}>
+                ［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}ツイン
+              </Typography>
+            </Box>
           </div>)}
         {!user.ROLE &&
           (<Typography fontSize={"x-large"}>{user.USER_NAME}</Typography>)}
-        <Box>HP：
-          {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"30px"}
-                                                                  style={{marginTop: "0px"}}
-                                                                  key={`life_${user.USER_ID}_${lifeIndex}`}
-                                                                  className={(lifeIndex < user.HP ? "life_img" : "life_img_dead")}/>)}</Box>
-        <Box>
-          魔力：{user.MANA}
-        </Box>
-      </Grid>
+        {/*<Box>HP：*/}
+        {/*  {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"30px"}*/}
+        {/*                                                          style={{marginTop: "0px"}}*/}
+        {/*                                                          key={`life_${user.USER_ID}_${lifeIndex}`}*/}
+        {/*                                                          className={(lifeIndex < user.HP ? "life_img" : "life_img_dead")}/>)}</Box>*/}
+        {/*<Box>*/}
+        {/*  魔力：{user.MANA}*/}
+        {/*</Box>*/}
     </Grid>
   }
 
@@ -246,7 +247,7 @@ function Player() {
         <h2 style={{margin: "10px"}}>プレイヤー用ページ</h2>
         <PhaseDisplay roomInfo={roomInfo}/>
         <Grid item xs={12} mt={"10px"}>
-          <Button onClick={() => setUpd(v => v + 1)}>更新</Button>
+          <Button onClick={() => setUpd(v => v + 1)}>情報更新</Button>
         </Grid>
         <Box style={{
           display: "flex",
