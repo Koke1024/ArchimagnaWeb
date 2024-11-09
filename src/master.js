@@ -7,9 +7,11 @@ import {backgroundColors, Box, Button, Text} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
 import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
-import {Grid, Input, Paper, Typography} from "@mui/material";
+import {Grid, Input, Paper, SvgIcon, Typography} from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
+import PopupOnCursor from "./component/Popup";
 import {RoomContext, UsersContext} from "./App";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 export default function Master() {
   const {users, setUsers} = useContext(UsersContext);
@@ -27,8 +29,20 @@ export default function Master() {
   const submitRef = useRef(null);
   const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
 
+  function CopyText(text) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log("Copied")
+      })
+      .catch((err) => {
+        console.error('コピーエラー:', err);
+      });
+  }
+
   useEffect(() => {
-    submitRef.current.disabled = true;
+    if(submitRef.current){
+      submitRef.current.disabled = true;
+    }
     getActionLog();
   }, []);
 
@@ -166,9 +180,18 @@ export default function Master() {
     </header>
   }
 
+  const playerFullUrl = (user_id, token) => {
+    return `${window.location.origin}/${roomInfo.ROOM_ID}/${user_id}/${token}`;
+  }
+
+  const playerUrl = (user_id, token) => {
+    return `/${roomInfo.ROOM_ID}/${user_id}/${token}`;
+  }
+
   const openPlayerPage = (user_id, token) => {
-    console.log(`/${roomInfo.ROOM_ID}/${user_id}/${token}`)
-    navigate(`/${roomInfo.ROOM_ID}/${user_id}/${token}`);
+    var link = playerUrl(user_id, token);
+    console.log(link)
+    navigate(link);
   }
 
   function RegisterUsers() {
@@ -182,7 +205,6 @@ export default function Master() {
       if (newNames[i] === "") {
         newNames[i] = "プレイヤー" + (i);
       }
-      console.log(newNames)
     }
 
     if (roomInfo.ROOM_ID) {
@@ -204,10 +226,20 @@ export default function Master() {
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
-              <Typography variant={"h6"} color={user.HP > 0? "black": "red"}
-                          className={"text-outline"}>
-                <span className={"pointer"} onClick={() => openPlayerPage(user.USER_ID, user.TOKEN)}>※</span>
-                ［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}ツイン</Typography></Box>
+              <Paper className={"drac-d-inline-flex"} sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}} color={TeamInfo[user.TEAM].Color}>
+                <Typography variant={"h6"} color={user.HP > 0 ? "black" : "red"}
+                          className={"text-outline drac-d-inline"}>
+                  ［{RoleInfo[user.ROLE]}］{user.USER_NAME}
+                </Typography>
+                <div className={"pointer"} color="gray" m={"xs"} sx={{borderRadius: "10px"}}
+                       onClick={() => CopyText(`${user.USER_NAME}：` + playerFullUrl(user.USER_ID, user.TOKEN))}>
+                  <ContentCopyIcon/>
+                </div>
+              </Paper>
+              <Box color={"black"}>
+                <span>{TeamInfo[user.TEAM].Name}ツイン</span>
+              </Box>
+            </Box>
           </div>)}
         {!user.ROLE &&
           (<Typography fontSize={"x-large"}>{index + 1}：{user.USER_NAME}</Typography>)}
@@ -277,7 +309,7 @@ export default function Master() {
   return (
     <Box className="App" style={{width: "700px"}} m={"auto"}>
       <Header/>
-
+      {/*<PopupOnCursor/>*/}
       <Grid container className={"Controller"}>
         <Grid item xs={2}></Grid>
         <Grid item xs={2}>
@@ -334,8 +366,9 @@ export default function Master() {
             </Grid>
           ) :
           <form>
+            <>プレイヤーの名前を入力</>
             <InputPlayerNames/>
-            <Button m={"xs"} onClick={RegisterUsers}>登録
+            <Button m={"xs"} onClick={RegisterUsers}>プレイヤー名登録
             </Button>
           </form>}</Box>
       {/*<div>*/}

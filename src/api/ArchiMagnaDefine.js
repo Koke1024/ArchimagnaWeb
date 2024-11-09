@@ -27,18 +27,24 @@ export const RoleInfo = {
 }
 
 export const ActionInfo = {
-  1: {ID: 1, Name: "察知", Role: [5], Phase: [3], Target: 0, Mana: 1},
-  2: {ID: 2, Name: "凝視", Role: [6], Phase: [3], Target: 1, Mana: 1},
-  3: {ID: 3, Name: "忠誠", Role: [7], Phase: [3], Target: 0, Mana: 1},
-  4: {ID: 4, Name: "見分", Role: [8], Phase: [3], Target: 1, Mana: 1},
-  5: {ID: 5, Name: "裁定", Role: [1,2,3,4,5,6,7,8], Phase: [4], Target: false, Mana: 1},
-  6: {ID: 6, Name: "呼剥", Role: [1,2,3,4,5,6,7,8], Phase: [5], Target: 2, Mana: 1},
-  7: {ID: 7, Name: "戦闘", Role: [1,2,3,4,5,6,7,8], Phase: [7], Target: 1, Mana: 1},
-  8: {ID: 8, Name: "絶結", Role: [1,2,3,4], Phase: [3], Target: 2, Mana: 1},
-  9: {ID: 9, Name: "GM：HP操作", Role: [0], Phase: [], Target: true, Mana: 1},
-  10: {ID: 10, Name: "GM：魔力操作", Role: [0], Phase: [], Target: true, Mana: 1},
-  11: {ID: 11, Name: "使い魔", Role: [], Phase: [3], Target: 1, Mana: 1},
-  12: {ID: 12, Name: "命約", Role: [], Phase: [1,2], Target: 8, Mana: 1},
+  1: {ID: 1, Name: "察知", Role: [5], Phase: [3], Target: 0, Mana: 1, Description: "魔力を 1 消費する。陣営会議開始時点で魔力が最も高いプレイヤーが誰かを知る。"},
+  2: {ID: 2, Name: "凝視", Role: [6], Phase: [3], Target: 1, Mana: 1, Description: "魔力を 4 消費する。対象がアーヴかアルカナかを知る。"},
+  3: {ID: 3, Name: "忠誠", Role: [7], Phase: [3], Target: 0, Mana: 1, Description: "魔力を 4 消費する。この日、アルカナが受けるダメージを 1 だけ自身が代わり\n" +
+      "に受ける。"},
+  4: {ID: 4, Name: "見分", Role: [8], Phase: [3], Target: 1, Mana: 1, Description: "魔力を 1 消費する。任意の対象の昨夜の戦闘力を知る。"},
+  5: {ID: 5, Name: "裁定", Role: [1,2,3,4,5,6,7,8], Phase: [4], Target: false, Mana: 1, Description: "昨晩戦闘に勝利したもの一名 ( ただし自身とツインを除く ) と、その戦闘対象の両者を記述する。正解し\n" +
+      "ていた場合、魔力を 4 獲得する。失敗した場合魔力が -1 される。"},
+  6: {ID: 6, Name: "呼剥", Role: [1,2,3,4,5,6,7,8], Phase: [5], Target: 2, Mana: 1, Description: "自分以外の脱落していない PC を指定し対象の精霊を記述する。的中していた場合、対象の魔力を半減さ\n" +
+      "せたうえで ( 端数切り上げ ) 魔力を 4 獲得する。間違っていた場合、魔力を 2 失う。"},
+  7: {ID: 7, Name: "戦闘", Role: [1,2,3,4,5,6,7,8], Phase: [7], Target: 1, Mana: 1, Description: "魔力を使用して自身の精霊の戦闘力を高めて攻撃を行う。"},
+  8: {ID: 8, Name: "絶結", Role: [1,2,3,4], Phase: [3], Target: 2, Mana: 1, Description: "生存している二名を指定する。二人がツインであった場合、対象のアーヴのライフを 1, アルカ\n" +
+      "ナの魔力を 8 減少させたうえで、自身の魔力を 6 増加させる。失敗した場合、魔力が 6 減少する。"},
+  9: {ID: 9, Name: "GM：HP操作", Role: [0], Phase: [], Target: true, Mana: 1, Description: ""},
+  10: {ID: 10, Name: "GM：魔力操作", Role: [0], Phase: [], Target: true, Mana: 1, Description: ""},
+  11: {ID: 11, Name: "使い魔", Role: [], Phase: [3], Target: 1, Mana: 1, Description: "魔力を 1 支払う。任意の人物に文章を送る。"},
+  12: {ID: 12, Name: "命約", Role: [], Phase: [1,2], Target: 8, Mana: 1, Description: ""},
+  13: {ID: 13, Name: "護衛", Role: [5,6,7,8], Phase: [3], Target: 0, Mana: 1, Description: "魔力を 5 支払う。その日のアルカナの精霊が命約違反によるダメージ以外で死亡する際、代わ\n" +
+      "りに自身の精霊を死亡させる。"},
 }
 
 export const DefaultHP = 3;

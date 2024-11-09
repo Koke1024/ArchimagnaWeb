@@ -304,7 +304,8 @@ function Player() {
                       setInputAction(r[1].ID);
                     }
                   }
-                  }>
+                  }
+                title={r[1].Description}>
                   <Typography>{r[1].Name}</Typography>
                 </Button>
               </Grid>
