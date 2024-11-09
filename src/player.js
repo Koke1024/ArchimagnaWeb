@@ -65,8 +65,8 @@ function Player() {
     if (token) {
       api.GetRoomInfoFromUser(userId, token).then(r => {
         console.dir(r.data)
-        if (r.data.length > 0) {
-          setRoomInfo(r.data[0]);
+        if (Object.keys(r.data).length > 0) {
+          setRoomInfo(r.data);
         } else {
           console.error("対応する部屋が存在しない")
           navigate('/');
@@ -81,7 +81,7 @@ function Player() {
       return;
     }
     api.GetUserNames(userId, token).then(() => {
-      api.GetUserInfo(userId, token).then(r => setMyInfo(r.data[0]))
+      api.GetUserInfo(userId, token).then(r => setMyInfo(r.data))
     })
   }, [token, userId])
 

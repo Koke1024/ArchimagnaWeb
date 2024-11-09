@@ -58,9 +58,10 @@ export default function Master() {
   useEffect(() => {
     if (token) {
       api.GetRoomInfo(token).then(r => {
-        if (r.data.length > 0) {
+        console.log(r)
+        if (Object.keys(r.data).length !== 0) {
           console.log(r.data)
-          setRoomInfo(r.data[0]);
+          setRoomInfo(r.data);
         } else {
           console.error("対応する部屋が存在しない")
           navigate('/');
@@ -146,6 +147,7 @@ export default function Master() {
           <Link to={newURL} color={"skyblue"}>部屋URLはこちら</Link>
         </> :
         <Button m={"xs"} onClick={() => api.CreateRoom().then(r => {
+          console.log(r)
           navigate("/gm/" + r.data.TOKEN);
           // setNewURL("/gm/" + r.data.TOKEN)
         })}>新規ルームの作成
@@ -296,9 +298,9 @@ export default function Master() {
 
   const OnNextPhase = () => {
     api.NextPhase(roomInfo.ROOM_ID).then(r => {
-      if (r.data.length > 0) {
+      if (Object.keys(r.data).length > 0) {
         console.log(r.data)
-        setRoomInfo(r.data[0]);
+        setRoomInfo(r.data);
       } else {
         console.error("対応する部屋が存在しない")
         navigate('/');
@@ -324,7 +326,7 @@ export default function Master() {
           }}>HPと魔力を更新</Button>
         </Grid>
         <Grid item xs={2}>
-          <Button onClick={getActionLog}>ログを更新</Button>
+          <Button onClick={getActionLog}>ログ再取得</Button>
         </Grid>
         <Grid item xs={2}>
           {users.length > 0 ?
