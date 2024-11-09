@@ -186,3 +186,15 @@ input{
   pointer-events: none;
   opacity: 0.5;
 }
+
+::-webkit-scrollbar {
+  width: 16px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgb(117, 117, 117);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  background-color: rgb(0, 0, 0);
+}

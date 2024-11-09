@@ -7,7 +7,7 @@ import {backgroundColors, Box, Button, Text} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
 import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
-import {Grid, Input, Paper, SvgIcon, Typography} from "@mui/material";
+import {Grid, Paper, Typography} from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import PopupOnCursor from "./component/Popup";
 import {RoomContext, UsersContext} from "./App";
@@ -230,10 +230,10 @@ export default function Master() {
                 <Typography variant={"h6"} color={user.HP > 0 ? "black" : "red"}
                           className={"text-outline drac-d-inline"}>
                   ［{RoleInfo[user.ROLE]}］{user.USER_NAME}
-                </Typography>
-                <div className={"pointer"} color="gray" m={"xs"} sx={{borderRadius: "10px"}}
+                </Typography>　
+                <div className={"pointer"} color="gray"
                        onClick={() => CopyText(`${user.USER_NAME}：` + playerFullUrl(user.USER_ID, user.TOKEN))}>
-                  <ContentCopyIcon/>
+                  <ContentCopyIcon color={"gray"} fontSize={"xs"} ml={"xs"} mt={"xs"}/>
                 </div>
               </Paper>
               <Box color={"black"}>

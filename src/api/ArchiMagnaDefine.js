@@ -49,12 +49,7 @@ export const ActionInfo = {
 
 export const DefaultHP = 3;
 
-
 export const TargetSelectFormat = (args, actionId, value) => {
-  // if(actionId === 9){
-    console.log(actionId)
-    console.log(args)
-  // }
   switch (actionId) {
     case 5:
       return `裁定「昨晩、${args[0] ?? '?'}が${args[1] ?? '?'}との戦闘に勝利した」`;
