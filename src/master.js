@@ -1,15 +1,13 @@
-import logo from './img/archi_magna.png';
 import img_life from './img/life.png';
 import './App.css';
 import React, {useContext, useEffect, useRef, useState} from "react";
 import api from "./api/api";
-import {backgroundColors, Box, Button, Text} from 'dracula-ui';
+import {Box, Button} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
-import {ActionInfo, DefaultHP, PhaseInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
+import {DefaultHP, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
 import {Grid, Paper, Typography} from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
-import PopupOnCursor from "./component/Popup";
 import {RoomContext, UsersContext} from "./App";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
