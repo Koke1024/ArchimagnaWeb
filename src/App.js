@@ -1,6 +1,6 @@
-import React, {createContext, useContext} from 'react';
+import React, {createContext} from 'react';
 import 'dracula-ui/styles/dracula-ui.css';
-import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Player from './player';
 import Master from './master';
@@ -20,7 +20,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Master/>}/>
-          <Route path="/:room/:userId/:token" element={<Player/>}/>
+          <Route path="/pl/:room/:userId/:token" element={<Player/>}/>
           <Route path="/gm" element={<Master/>}/>
           <Route path="/gm/:token" element={<Master/>}/>
         </Routes>

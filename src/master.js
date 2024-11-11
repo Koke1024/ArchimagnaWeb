@@ -1,12 +1,12 @@
 import img_life from './img/life.png';
 import './App.css';
 import React, {useContext, useEffect, useRef, useState} from "react";
-import api from "./api/api";
+import api from "./utils/api";
 import {Box, Button} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
-import {DefaultHP, RoleInfo, TeamInfo} from "./api/ArchiMagnaDefine";
-import {Grid, Paper, Typography} from "@mui/material";
+import {DefaultHP, RoleInfo, TeamInfo} from "./utils/ArchiMagnaDefine";
+import {Grid2, Paper, Typography} from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -181,11 +181,11 @@ export default function Master() {
   }
 
   const playerFullUrl = (user_id, token) => {
-    return `${window.location.origin}/${roomInfo.ROOM_ID}/${user_id}/${token}`;
+    return `${window.location.origin}/pl/${roomInfo.ROOM_ID}/${user_id}/${token}`;
   }
 
   const playerUrl = (user_id, token) => {
-    return `/${roomInfo.ROOM_ID}/${user_id}/${token}`;
+    return `/${roomInfo.ROOM_ID}/pl/${user_id}/${token}`;
   }
 
   const openPlayerPage = (user_id, token) => {
@@ -220,9 +220,9 @@ export default function Master() {
     const [user,] = useState(props.player);
     var index = props.index;
 
-    return <Grid key={"player_info_" + user.USER_ID} container spacing={"xxs"} className={"Square"}>
+    return <Grid2 key={"player_info_" + user.USER_ID} container spacing={"xxs"} className={"Square"}>
       {/*名前*/}
-      <Grid item xs={12} className={"Item"}>
+      <Grid2 item xs={12} className={"Item"}>
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
@@ -285,13 +285,13 @@ export default function Master() {
             />
           </Box>
         </Box>
-      </Grid>
-      <Grid item xs={12}>
+      </Grid2>
+      <Grid2 item xs={12}>
         <Box>
           <PlayerLog player={users[index]} log={actionLog.filter(v => v.USER_ID === user.USER_ID)}/>
         </Box>
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   }
 
   const OnNextPhase = () => {
@@ -310,30 +310,30 @@ export default function Master() {
     <Box className="App" style={{width: "700px"}} m={"auto"}>
       <Header/>
       {/*<PopupOnCursor/>*/}
-      <Grid container className={"Controller"}>
-        <Grid item xs={2}></Grid>
-        <Grid item xs={2}>
+      <Grid2 container className={"Controller"}>
+        <Grid2 item xs={2}></Grid2>
+        <Grid2 item xs={2}>
           <Button onClick={toggleTeamOrder}>
             並び順変更
           </Button>
-        </Grid>
-        <Grid item xs={2}><Button
+        </Grid2>
+        <Grid2 item xs={2}><Button
           ref={submitRef}
           onClick={() => {
             updateUserInfo();
           }}>HPと魔力を更新</Button>
-        </Grid>
-        <Grid item xs={2}>
+        </Grid2>
+        <Grid2 item xs={2}>
           <Button onClick={getActionLog}>ログ再取得</Button>
-        </Grid>
-        <Grid item xs={2}>
+        </Grid2>
+        <Grid2 item xs={2}>
           {users.length > 0 ?
             <Button onClick={OnNextPhase} mx={"auto"}>
               {roomInfo.DAY > 0 ? <>フェイズを進める</> : <>開始</>}
             </Button> : ''}
-        </Grid>
-        <Grid item xs={2}></Grid>
-      </Grid>
+        </Grid2>
+        <Grid2 item xs={2}></Grid2>
+      </Grid2>
       <PhaseDisplay roomInfo={roomInfo}/>
       <Box style={{
         display: "flex",
@@ -353,17 +353,17 @@ export default function Master() {
           </>)}
         {users.length > 0 ?
           (
-            <Grid container spacing={2} className={"Square Players"}>
+            <Grid2 container spacing={2} className={"Square Players"}>
               {users.sort((a, b) => {
                 if (!isTeamOrder) {
                   return (a.USER_ID - b.USER_ID);
                 }
                 return (a.TEAM - b.TEAM) * 10 + (a.ROLE - b.ROLE);
-              }).map((r, index) => (<Grid key={"user_message_" + r.USER_ID} item xs={6}>
+              }).map((r, index) => (<Grid2 key={"user_message_" + r.USER_ID} item xs={6}>
                   <PlayerInformation player={users[index]} index={index}/>
-                </Grid>
+                </Grid2>
               ))}
-            </Grid>
+            </Grid2>
           ) :
           <form>
             <>プレイヤーの名前を入力</>

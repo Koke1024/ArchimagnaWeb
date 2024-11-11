@@ -1,20 +1,15 @@
 import './App.css';
 import React, {useContext, useEffect, useRef, useState} from "react";
-import api from "./api/api";
+import api from "./utils/api";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {ActionInfo, DefaultHP, RoleInfo, TargetSelectFormat, TeamInfo} from "./api/ArchiMagnaDefine";
+import {ActionInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./utils/ArchiMagnaDefine";
 import {
   Checkbox,
-  FormControl,
-  Grid,
-  Input,
-  InputLabel,
-  ListItemText, Menu, Paper,
+  Grid2,
   Typography
 } from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
-import img_life from "./img/life.png";
 import {Box, Button} from "dracula-ui";
 import {CustomInput, CustomMenu, CustomMenuItem, CustomListItemText} from "./component/Design";
 import ConfirmDialog from './component/Dialog';
@@ -203,7 +198,7 @@ function Player() {
       navigate(`/${roomInfo.ROOM_ID}/${user.USER_ID}/${token}`);
     }
 
-    return <Grid key={"player_info_" + index} item xs={6} className={"Item"} >
+    return <Grid2 key={"player_info_" + index} item xs={6} className={"Item"} >
       {/*名前*/}
         {user.ROLE &&
           (<div>
@@ -223,7 +218,7 @@ function Player() {
         {/*<Box>*/}
         {/*  魔力：{user.MANA}*/}
         {/*</Box>*/}
-    </Grid>
+    </Grid2>
   }
 
   if (!token) {
@@ -246,9 +241,9 @@ function Player() {
         <h1 style={{paddingTop: "30px"}}>ArchiMagna</h1>
         <h2 style={{margin: "10px"}}>プレイヤー用ページ</h2>
         <PhaseDisplay roomInfo={roomInfo}/>
-        <Grid item xs={12} mt={"10px"}>
+        <Grid2 item xs={12} mt={"10px"}>
           <Button onClick={() => setUpd(v => v + 1)}>情報更新</Button>
-        </Grid>
+        </Grid2>
         <Box style={{
           display: "flex",
           flexDirection: "row",
@@ -261,12 +256,12 @@ function Player() {
       </header>
 
       <Box p={"md"}>
-        <Grid container>
-          <Grid item xs={3}></Grid>
+        <Grid2 container>
+          <Grid2 item xs={3}></Grid2>
           <PlayerInformation player={myInfo} index={0}/>
-        </Grid>
+        </Grid2>
       </Box>
-      <Grid container spacing={2}>
+      <Grid2 container spacing={2}>
         {/*Text input: <input name="myInput" type="text"*/}
         {/*                   value={userName} onChange={(e) => setUserName(e.target.value)}/>*/}
         {/*<button onClick={() => api.AddUser(userName).then(res => {*/}
@@ -274,26 +269,26 @@ function Player() {
         {/*})}>送信*/}
         {/*</button>*/}
 
-        {/*<Grid item xs={12}><Typography>プレイヤー：</Typography></Grid>*/}
+        {/*<Grid2 item xs={12}><Typography>プレイヤー：</Typography></Grid2>*/}
         {/*{users && users.map(user => {*/}
-        {/*  return <Grid xs={3} item key={'id_' + user.USER_ID}>*/}
+        {/*  return <Grid2 xs={3} item key={'id_' + user.USER_ID}>*/}
         {/*    <Paper><Typography py={"5px"}>*/}
         {/*      ［{user.USER_NAME}］*/}
         {/*    </Typography>*/}
         {/*    </Paper>*/}
-        {/*  </Grid>*/}
+        {/*  </Grid2>*/}
         {/*})}*/}
 
         {myInfo ?
-          <><Grid item xs={3}></Grid>
-            <Grid item xs={6} md={6}>
+          <><Grid2 item xs={3}></Grid2>
+            <Grid2 item xs={6} md={6}>
               <Typography>
                 行うアクション
               </Typography>
-            </Grid>
-            <Grid item xs={3}></Grid>
+            </Grid2>
+            <Grid2 item xs={3}></Grid2>
             {EnableAction().map(r => {
-              return <Grid item key={"action_" + r[0]} xs={2}>
+              return <Grid2 item key={"action_" + r[0]} xs={2}>
                 <Button
                   variant={IsActiveAction(r[1].ID) ? "normal" : "ghost"}
                   disabled={!IsActiveAction(r[1].ID)}
@@ -308,31 +303,31 @@ function Player() {
                 title={r[1].Description}>
                   <Typography>{r[1].Name}</Typography>
                 </Button>
-              </Grid>
+              </Grid2>
             })}
-            <Grid item xs={12}>
+            <Grid2 item xs={12}>
               <MultiSelectTarget/>
-            </Grid>
+            </Grid2>
             {inputAction === 7 ?
-              <Grid item xs={12}>
+              <Grid2 item xs={12}>
                 消費魔力 ：
                 <CustomInput
                   type={"number"} defaultValue={actionValue} onChange={(e) => {
                   setActionValue(e.target.value)
                 }}></CustomInput>
-              </Grid> : <></>
+              </Grid2> : <></>
             }
             {inputAction === 12 ?
-              <Grid item xs={12}>
+              <Grid2 item xs={12}>
                 命約内容 ：
                 <CustomInput
                   fullWidth
                   type={"text"} defaultValue={actionValue} onChange={(e) => {
                   setActionValue(e.target.value)
                 }}></CustomInput>
-              </Grid> : <></>
+              </Grid2> : <></>
             }
-            <Grid item xs={12}>
+            <Grid2 item xs={12}>
               {(inputAction !== 0) ?
                 <>
                   <Button variant="contained" color="red" onClick={handleOpen}>
@@ -362,15 +357,15 @@ function Player() {
                   />
                 </>
                 : <></>}
-            </Grid>
+            </Grid2>
           </> : ''
         }
-        <Grid item xs={12}>
+        <Grid2 item xs={12}>
           <Box className={"SquareFull"}>
             <PlayerLog player={myInfo} log={actionLog}/>
           </Box>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
       {/*<Header/>*/}
 
     </Box>

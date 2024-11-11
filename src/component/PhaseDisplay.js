@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {Box} from "dracula-ui";
-import {Grid, Typography} from "@mui/material";
-import {PhaseInfo, TargetSelectFormat} from "../api/ArchiMagnaDefine";
-import {minWidth} from "@mui/system";  // 必要ならPropTypesを追加
+import {Grid2, Typography} from "@mui/material";
+import {PhaseInfo, TargetSelectFormat} from "../utils/ArchiMagnaDefine";
 
 const PhaseDisplay = ({roomInfo}) => {
   if (!roomInfo) {
@@ -60,11 +59,11 @@ export const PlayerLog = (props) => {
           day = r.DAY;
           dayString = <Box variant={"caption"} color={"white"} px={"xxs"} fontSize={"x-large"}>{day}日目</Box>
         }
-        return (<Grid key={"user_action_log_" + r.ACTION_LOG_ID} item xs={12} className={"drac-text-left"}>
+        return (<Grid2 key={"user_action_log_" + r.ACTION_LOG_ID} item xs={12} className={"drac-text-left"}>
           {dayString}
           <Box px={"xs"}>{
             TargetSelectFormat((r.ACTION_ID === 12) ? args.slice(0, -1) : args, r.ACTION_ID, (r.ACTION_ID === 7) ? args[1] : args[args.length - 1])}</Box>
-        </Grid>)
+        </Grid2>)
       }
     )}
   </Box>)
