@@ -6,7 +6,7 @@ import {Box, Button} from 'dracula-ui';
 // import { Input } from '@mui/material';
 import {Link, useParams, useLocation, useNavigate} from 'react-router-dom'
 import {DefaultHP, RoleInfo, TeamInfo} from "./utils/ArchiMagnaDefine";
-import {Grid2, Paper, Typography} from "@mui/material";
+import {Grid, Paper, Typography} from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -19,7 +19,6 @@ export default function Master() {
   const nameInputRefs = useRef([]);
   const manaAddInputRefs = useRef([]);
   const [isTeamOrder, setTeamOrder] = useState(false);
-  const [newURL, setNewURL] = useState("");
   const {token} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,7 +37,7 @@ export default function Master() {
   }
 
   useEffect(() => {
-    if(submitRef.current){
+    if (submitRef.current) {
       submitRef.current.disabled = true;
     }
     getActionLog();
@@ -141,15 +140,11 @@ export default function Master() {
   if (!token) {
     return <div className="App">
       <Header/>
-      {newURL ? <>
-          <Link to={newURL} color={"skyblue"}>部屋URLはこちら</Link>
-        </> :
         <Button m={"xs"} onClick={() => api.CreateRoom().then(r => {
           console.log(r)
           navigate("/gm/" + r.data.TOKEN);
-          // setNewURL("/gm/" + r.data.TOKEN)
         })}>新規ルームの作成
-        </Button>}
+        </Button>
     </div>
   }
 
@@ -167,15 +162,15 @@ export default function Master() {
     }
 
     return <header className="App-header">
-      <h1 style={{paddingTop: "30px"}}>ArchiMagna</h1>
-      <h2 style={{margin: "10px"}}>マスター用ページ</h2>
+      <h1 style={{paddingTop: "30px"}}>ArchiMagna GM</h1>
       {token ?
         <>
+          <div style={{margin: "10px"}}>GM用URL</div>
+          <Box onClick={CopyUrl} className={"drac-d-flex"} style={{margin: "auto", width: "50%", cursor: 'pointer'}}>
+            <input readOnly={true} type={"text"} style={{cursor: 'pointer'}} value={fullPath}></input>
+            <ContentCopyIcon color={"gray"} style={{marginLeft: "-40px", marginTop: "8px"}}/>
+          </Box>
           <div style={{margin: "10px"}}>URLを紛失しないようにしてください。</div>
-          <div>GM用URL</div>
-          <input onClick={CopyUrl} style={{margin: "auto", width: "100%", cursor: 'pointer'}} readOnly={true}
-                 type={"text"}
-                 value={fullPath}></input>
         </> : ''}
     </header>
   }
@@ -185,7 +180,7 @@ export default function Master() {
   }
 
   const playerUrl = (user_id, token) => {
-    return `/${roomInfo.ROOM_ID}/pl/${user_id}/${token}`;
+    return `/pl/${roomInfo.ROOM_ID}/${user_id}/${token}`;
   }
 
   const openPlayerPage = (user_id, token) => {
@@ -220,20 +215,22 @@ export default function Master() {
     const [user,] = useState(props.player);
     var index = props.index;
 
-    return <Grid2 key={"player_info_" + user.USER_ID} container spacing={"xxs"} className={"Square"}>
+    return <Grid key={"player_info_" + user.USER_ID} container spacing={"xxs"} className={"Square"}>
       {/*名前*/}
-      <Grid2 item xs={12} className={"Item"}>
+      <Grid item xs={12} className={"Item"}>
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
-              <Paper className={"drac-d-inline-flex"} sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}} color={TeamInfo[user.TEAM].Color}>
+              <Paper className={"drac-d-inline-flex"}
+                     sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}}
+                     color={TeamInfo[user.TEAM].Color}>
                 <Typography variant={"h6"} color={user.HP > 0 ? "black" : "red"}
-                          className={"text-outline drac-d-inline"}>
+                            className={"text-outline drac-d-inline"}>
                   ［{RoleInfo[user.ROLE]}］{user.USER_NAME}
-                </Typography>　
-                <div className={"pointer"} color="gray"
-                       onClick={() => CopyText(`${user.USER_NAME}：` + playerFullUrl(user.USER_ID, user.TOKEN))}>
-                  <ContentCopyIcon color={"gray"} fontSize={"xs"} ml={"xs"} mt={"xs"}/>
+                </Typography>
+                <div className={"pointer"} color="gray" title={"プレイヤー用URLをクリップボードにコピー"}
+                     onClick={() => CopyText(`${user.USER_NAME}：` + playerFullUrl(user.USER_ID, user.TOKEN))}>
+                  <ContentCopyIcon color={"gray"} fontSize={"xs"} style={{marginTop: "8px", marginLeft: "10px"}}/>
                 </div>
               </Paper>
               <Box color={"black"}>
@@ -259,10 +256,11 @@ export default function Master() {
                                                                       // setRewritten(true);
 
                                                                       submitRef.current.disabled = false;
-                                                                        console.log(users)
+                                                                      console.log(users)
                                                                     }}/>)}
 
-            　魔力 ： <Typography className={"drac-d-inline"} color={"white"} fontSize={"x-large"}>{user.MANA}</Typography> +　
+            魔力 ： <Typography className={"drac-d-inline"} color={"white"}
+                               fontSize={"x-large"}>{user.MANA}</Typography> +
             <input
               ref={(el) => (manaAddInputRefs.current[index] = el)}
               defaultValue={manaAddInputRefs.current[index]}
@@ -278,20 +276,20 @@ export default function Master() {
               onChange={event => {
                 manaAddInputRefs.current[index].value = event.target.value;
                 console.log(+event.target.value)
-                if(+(event.target.value) !== 0){
+                if (+(event.target.value) !== 0) {
                   submitRef.current.disabled = false;
                 }
               }}
             />
           </Box>
         </Box>
-      </Grid2>
-      <Grid2 item xs={12}>
+      </Grid>
+      <Grid item xs={12}>
         <Box>
           <PlayerLog player={users[index]} log={actionLog.filter(v => v.USER_ID === user.USER_ID)}/>
         </Box>
-      </Grid2>
-    </Grid2>
+      </Grid>
+    </Grid>
   }
 
   const OnNextPhase = () => {
@@ -310,7 +308,7 @@ export default function Master() {
     <Box className="App" style={{width: "700px"}} m={"auto"}>
       <Header/>
       {/*<PopupOnCursor/>*/}
-      <Box container spacing={3} className={"Controller"}>
+      <Box className={"Controller"}>
         <Button onClick={toggleTeamOrder}>
           並び順変更
         </Button>
@@ -319,18 +317,18 @@ export default function Master() {
           onClick={() => {
             updateUserInfo();
           }}>HPと魔力を更新</Button>
-          <Button onClick={getActionLog}>ログ再取得</Button>
-          {users.length > 0 ?
-            <Button onClick={OnNextPhase} mx={"auto"}>
-              {roomInfo.DAY > 0 ? <>フェイズを進める</> : <>開始</>}
-            </Button> : ''}
+        <Button onClick={getActionLog}>ログ再取得</Button>
+        {users.length > 0 ?
+          <Button onClick={OnNextPhase} mx={"auto"}>
+            {roomInfo.DAY > 0 ? <>フェイズを進める</> : <>開始</>}
+          </Button> : ''}
       </Box>
       <PhaseDisplay roomInfo={roomInfo}/>
       <Box style={{
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        width: "800px",
+        width: "700px",
         resize: "both",
         margin: "30px auto"
       }}>
@@ -344,17 +342,17 @@ export default function Master() {
           </>)}
         {users.length > 0 ?
           (
-            <Grid2 container spacing={2} className={"Square Players"}>
+            <Grid container spacing={2} className={"Square Players"}>
               {users.sort((a, b) => {
                 if (!isTeamOrder) {
                   return (a.USER_ID - b.USER_ID);
                 }
                 return (a.TEAM - b.TEAM) * 10 + (a.ROLE - b.ROLE);
-              }).map((r, index) => (<Grid2 key={"user_message_" + r.USER_ID} item xs={6}>
+              }).map((r, index) => (<Grid key={"user_message_" + r.USER_ID} item xs={6}>
                   <PlayerInformation player={users[index]} index={index}/>
-                </Grid2>
+                </Grid>
               ))}
-            </Grid2>
+            </Grid>
           ) :
           <form>
             <>プレイヤーの名前を入力</>
@@ -378,7 +376,7 @@ function Flex(props) {
       flexDirection: "column",
       flexWrap: "wrap",
       width: "100%",
-      height: "250px",
+      height: "200px",
       margin: "auto",
     }}>{props.children}
     </div>

@@ -5,7 +5,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {ActionInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./utils/ArchiMagnaDefine";
 import {
   Checkbox,
-  Grid2,
+  Grid,
   Typography
 } from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
@@ -198,7 +198,7 @@ function Player() {
       navigate(`/${roomInfo.ROOM_ID}/${user.USER_ID}/${token}`);
     }
 
-    return <Grid2 key={"player_info_" + index} item xs={6} className={"Item"} >
+    return <Grid key={"player_info_" + index} item xs={6} className={"Item"} >
       {/*名前*/}
         {user.ROLE &&
           (<div>
@@ -218,7 +218,7 @@ function Player() {
         {/*<Box>*/}
         {/*  魔力：{user.MANA}*/}
         {/*</Box>*/}
-    </Grid2>
+    </Grid>
   }
 
   if (!token) {
@@ -241,9 +241,9 @@ function Player() {
         <h1 style={{paddingTop: "30px"}}>ArchiMagna</h1>
         <h2 style={{margin: "10px"}}>プレイヤー用ページ</h2>
         <PhaseDisplay roomInfo={roomInfo}/>
-        <Grid2 item xs={12} mt={"10px"}>
+        <Grid item xs={12} mt={"10px"}>
           <Button onClick={() => setUpd(v => v + 1)}>情報更新</Button>
-        </Grid2>
+        </Grid>
         <Box style={{
           display: "flex",
           flexDirection: "row",
@@ -256,12 +256,12 @@ function Player() {
       </header>
 
       <Box p={"md"}>
-        <Grid2 container>
-          <Grid2 item xs={3}></Grid2>
+        <Grid container>
+          <Grid item xs={3}></Grid>
           <PlayerInformation player={myInfo} index={0}/>
-        </Grid2>
+        </Grid>
       </Box>
-      <Grid2 container spacing={2}>
+      <Grid container spacing={2}>
         {/*Text input: <input name="myInput" type="text"*/}
         {/*                   value={userName} onChange={(e) => setUserName(e.target.value)}/>*/}
         {/*<button onClick={() => api.AddUser(userName).then(res => {*/}
@@ -269,26 +269,26 @@ function Player() {
         {/*})}>送信*/}
         {/*</button>*/}
 
-        {/*<Grid2 item xs={12}><Typography>プレイヤー：</Typography></Grid2>*/}
+        {/*<Grid item xs={12}><Typography>プレイヤー：</Typography></Grid>*/}
         {/*{users && users.map(user => {*/}
-        {/*  return <Grid2 xs={3} item key={'id_' + user.USER_ID}>*/}
+        {/*  return <Grid xs={3} item key={'id_' + user.USER_ID}>*/}
         {/*    <Paper><Typography py={"5px"}>*/}
         {/*      ［{user.USER_NAME}］*/}
         {/*    </Typography>*/}
         {/*    </Paper>*/}
-        {/*  </Grid2>*/}
+        {/*  </Grid>*/}
         {/*})}*/}
 
         {myInfo ?
-          <><Grid2 item xs={3}></Grid2>
-            <Grid2 item xs={6} md={6}>
+          <><Grid item xs={3}></Grid>
+            <Grid item xs={6} md={6}>
               <Typography>
                 行うアクション
               </Typography>
-            </Grid2>
-            <Grid2 item xs={3}></Grid2>
+            </Grid>
+            <Grid item xs={3}></Grid>
             {EnableAction().map(r => {
-              return <Grid2 item key={"action_" + r[0]} xs={2}>
+              return <Grid item key={"action_" + r[0]} xs={2}>
                 <Button
                   variant={IsActiveAction(r[1].ID) ? "normal" : "ghost"}
                   disabled={!IsActiveAction(r[1].ID)}
@@ -303,31 +303,31 @@ function Player() {
                 title={r[1].Description}>
                   <Typography>{r[1].Name}</Typography>
                 </Button>
-              </Grid2>
+              </Grid>
             })}
-            <Grid2 item xs={12}>
+            <Grid item xs={12}>
               <MultiSelectTarget/>
-            </Grid2>
+            </Grid>
             {inputAction === 7 ?
-              <Grid2 item xs={12}>
+              <Grid item xs={12}>
                 消費魔力 ：
                 <CustomInput
                   type={"number"} defaultValue={actionValue} onChange={(e) => {
                   setActionValue(e.target.value)
                 }}></CustomInput>
-              </Grid2> : <></>
+              </Grid> : <></>
             }
-            {inputAction === 12 ?
-              <Grid2 item xs={12}>
-                命約内容 ：
+            {(inputAction === 11 || inputAction === 12) ?
+              <Grid item xs={12}>
+                {(inputAction === 11)? "伝言": "命約"}内容 ：
                 <CustomInput
                   fullWidth
                   type={"text"} defaultValue={actionValue} onChange={(e) => {
                   setActionValue(e.target.value)
                 }}></CustomInput>
-              </Grid2> : <></>
+              </Grid> : <></>
             }
-            <Grid2 item xs={12}>
+            <Grid item xs={12}>
               {(inputAction !== 0) ?
                 <>
                   <Button variant="contained" color="red" onClick={handleOpen}>
@@ -342,7 +342,7 @@ function Player() {
                         if (inputAction === 7) {
                           selectedTargets.current[1] = actionValue;
                         }
-                        if (inputAction === 12) {
+                        if ((inputAction === 11 || inputAction === 12)) {
                           selectedTargets.current = Object.values({actionValue, ...selectedTargets.current});
                         }
                         api.SendAction(myInfo.USER_ID, inputAction, JSON.stringify(selectedTargets.current), roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
@@ -357,15 +357,15 @@ function Player() {
                   />
                 </>
                 : <></>}
-            </Grid2>
+            </Grid>
           </> : ''
         }
-        <Grid2 item xs={12}>
+        <Grid item xs={12}>
           <Box className={"SquareFull"}>
             <PlayerLog player={myInfo} log={actionLog}/>
           </Box>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
       {/*<Header/>*/}
 
     </Box>

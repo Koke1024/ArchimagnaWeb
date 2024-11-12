@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         })
         .select('*');
 
-      res.status(200).json(room);
+      res.status(200).json(room[0]);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

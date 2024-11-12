@@ -64,7 +64,7 @@ export const TargetSelectFormat = (args, actionId, value) => {
     case 10:
       return `GM操作：マナ${args[0] > 0? "+": ""}${args[0]}`;
     case 11:
-      return `${args[0] ?? '?'}に使い魔を送る`;
+      return `${args[0] ?? '?'}に使い魔「${(value.length === 0)? '?': value}」`;
     case 12:
       return `命約「${(value.length === 0)? '?': value}」　締結者：${args.join(",")}`;
     default:

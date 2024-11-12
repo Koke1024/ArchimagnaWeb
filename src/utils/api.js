@@ -116,7 +116,7 @@ class ApiClass{
       ROOM_ID: roomId,
       USER_ID: userId
     }
-    return axios.get(baseURL + '/game/log/user', {params: param});
+    return axios.get(baseURL + '/game/log_user', {params: param});
   }
 
   UpdateUserInfo(roomId, users){

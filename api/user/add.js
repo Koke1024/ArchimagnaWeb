@@ -8,6 +8,7 @@ export default async function handler(req, res) {
 
     try {
       const users = USER_NAMES.map(name => ({ USER_NAME: name, ROOM_ID }));
+      console.log(db('USER_TBL').insert(users).toSQL())
       await db('USER_TBL').insert(users);
       const updatedUsers = await db('USER_TBL').select('*').where({ ROOM_ID });
       res.status(201).json(updatedUsers);
