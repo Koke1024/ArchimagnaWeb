@@ -310,30 +310,21 @@ export default function Master() {
     <Box className="App" style={{width: "700px"}} m={"auto"}>
       <Header/>
       {/*<PopupOnCursor/>*/}
-      <Grid2 container className={"Controller"}>
-        <Grid2 item xs={2}></Grid2>
-        <Grid2 item xs={2}>
-          <Button onClick={toggleTeamOrder}>
-            並び順変更
-          </Button>
-        </Grid2>
-        <Grid2 item xs={2}><Button
+      <Box container spacing={3} className={"Controller"}>
+        <Button onClick={toggleTeamOrder}>
+          並び順変更
+        </Button>
+        <Button
           ref={submitRef}
           onClick={() => {
             updateUserInfo();
           }}>HPと魔力を更新</Button>
-        </Grid2>
-        <Grid2 item xs={2}>
           <Button onClick={getActionLog}>ログ再取得</Button>
-        </Grid2>
-        <Grid2 item xs={2}>
           {users.length > 0 ?
             <Button onClick={OnNextPhase} mx={"auto"}>
               {roomInfo.DAY > 0 ? <>フェイズを進める</> : <>開始</>}
             </Button> : ''}
-        </Grid2>
-        <Grid2 item xs={2}></Grid2>
-      </Grid2>
+      </Box>
       <PhaseDisplay roomInfo={roomInfo}/>
       <Box style={{
         display: "flex",

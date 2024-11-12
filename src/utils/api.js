@@ -50,6 +50,10 @@ class ApiClass{
     return axios.get(baseURL + '/user/info', {params: param});
   }
 
+  TestApi(){
+    return axios.get(baseURL + '/test');
+  }
+
   CreateRoom(){
     return axios.post(baseURL + '/room/create');
   }

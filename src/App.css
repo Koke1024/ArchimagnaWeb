@@ -101,6 +101,9 @@ input{
   border-top: .3rem solid transparent;
   border-color:  var(--blackSecondary);
 }
+.Controller button{
+  margin: 0 20px;
+}
 
 .Phase{
   background: var(--blackTernary);

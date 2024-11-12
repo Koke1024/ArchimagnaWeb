@@ -1,5 +1,5 @@
 // api/game/log_user.js
-const db = require('/../../src/utils/knexfile');
+const db = require('../../knexfile.js');
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
