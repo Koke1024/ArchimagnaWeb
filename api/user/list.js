@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     if (!ROOM_ID) return res.status(400).json({ error: 'ROOM_ID is required' });
 
     try {
-      var users;
+      let users;
       if(ALL){
         users = await db('USER_TBL').select('*').where({ ROOM_ID });
       }else{
