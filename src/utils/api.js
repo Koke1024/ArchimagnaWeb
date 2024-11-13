@@ -28,7 +28,8 @@ class ApiClass{
 
   GetUserList(roomId){
     let param = {
-      ROOM_ID: roomId
+      ROOM_ID: roomId,
+      ALL: false
     }
     console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});
@@ -36,10 +37,11 @@ class ApiClass{
 
   GetUserNames(roomId){
     let param = {
-      ROOM_ID: roomId
+      ROOM_ID: roomId,
+      ALL: true
     }
     console.log(param)
-    return axios.get(baseURL + '/user/names', {params: param});
+    return axios.get(baseURL + '/user/list', {params: param});
   }
 
   GetUserInfo(userId, token){
