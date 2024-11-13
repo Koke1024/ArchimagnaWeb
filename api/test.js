@@ -2,8 +2,6 @@
 const db = require('../knexfile.js');
 
 export default async function handler(req, res) {
-  res.status(200).json({ message: 'Hello, world!' });
-
   if (req.method === 'GET') {
     try {
       const rooms = db('ROOM_TBL').select("*")
