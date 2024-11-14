@@ -1,3 +1,8 @@
+console.log(process.env.REACT_APP_DB_HOST);
+console.log(process.env.REACT_APP_DB_USER);
+console.log(process.env.REACT_APP_DB_PASSWORD);
+console.log(process.env.REACT_APP_DB_NAME);
+
 const db = require('knex')({
   client: 'mysql2',
   connection: {
