@@ -26,8 +26,6 @@ export default function Master() {
   const submitRef = useRef(null);
   const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
 
-  console.dir(process.env);
-
   function CopyText(text) {
     navigator.clipboard.writeText(text)
       .then(() => {
