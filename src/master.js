@@ -14,8 +14,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 export default function Master() {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
-  const [usersLife, setUsersLife] = useState(Array(8).fill(0));
   const [actionLog, setActionLog] = useState([]);
+  const usersLife = useRef(Array(8).fill(0));
   const nameInputRefs = useRef([]);
   const manaAddInputRefs = useRef([]);
   const [isTeamOrder, setTeamOrder] = useState(false);
@@ -96,10 +96,10 @@ export default function Master() {
       _users[i].MANA = +(manaAddInputRefs.current[i].value) ?? 0;
     }
     for (let i = 0; i < _users.length; ++i) {
-      _users[i].HP = usersLife[i] ?? 0;
+      _users[i].HP = usersLife.current[i] ?? 0;
     }
     api.UpdateUserInfo(roomInfo.ROOM_ID, _users).then(res => {
-      setUsersLife(Array(8).fill(0));
+      usersLife.current = (Array(8).fill(0));
       setUsers(res.data)
       getActionLog();
       submitRef.current.disabled = true;
@@ -226,14 +226,18 @@ export default function Master() {
             {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"25px"}
                                                                     style={{marginTop: "0px", marginLeft: "4px"}}
                                                                     key={`life_${user.USER_ID}_${lifeIndex}`}
-                                                                    className={(lifeIndex < (user.HP + usersLife[index]) ? "life_img" : "life_img_dead") + " pointer"}
-                                                                    onClick={() => {
-                                                                      if (lifeIndex < (user.HP + usersLife[index])) {
-                                                                        usersLife[index] -= 1;
-                                                                      } else {
-                                                                        usersLife[index] += 1;
+                                                                    className={(lifeIndex < (user.HP + usersLife.current[index]) ? "life_img" : "life_img_dead") + " pointer"}
+                                                                    onClick={(event) => {
+                                                                      if(lifeIndex < (user.HP + usersLife.current[index] - 1) || lifeIndex > (user.HP + usersLife.current[index])){
+                                                                        return;
                                                                       }
-                                                                      setUsersLife(usersLife.filter(_ => true));
+                                                                      if (lifeIndex < (user.HP + usersLife.current[index])) {
+                                                                        usersLife.current[index] -= 1;
+                                                                        event.target.style.filter = "grayscale(100%)";
+                                                                      } else {
+                                                                        event.target.style.filter = "grayscale(0)";
+                                                                        usersLife.current[index] += 1;
+                                                                      }
                                                                       // setRewritten(true);
 
                                                                       submitRef.current.disabled = false;
