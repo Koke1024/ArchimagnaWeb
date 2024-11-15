@@ -62,7 +62,7 @@ export const TargetSelectFormat = (args, actionId, value) => {
     case 9:
       return `GM操作：HP　${args[0] > 0? "+": ""}${args[0]}`;
     case 10:
-      return `GM操作：マナ${args[0] > 0? "+": ""}${args[0]}`;
+      return `GM操作：魔力${args[0] > 0? "+": ""}${args[0]}`;
     case 11:
       return `${args[0] ?? '?'}に使い魔「${(value.length === 0)? '?': value}」`;
     case 12:

@@ -24,7 +24,6 @@ export default function Master() {
   const navigate = useNavigate();
   const [upd, setUpd] = useState(0);
   const submitRef = useRef(null);
-  const [playerNames, setPlayerNames] = useState(Array(8).fill(""));
 
   function CopyText(text) {
     navigator.clipboard.writeText(text)
@@ -119,7 +118,7 @@ export default function Master() {
                   ref={(el) => (nameInputRefs.current[index] = el)}
                   placeholder={`Player ${index + 1}`}
                   type="text"
-                  style={{width: '200px', margin: '10px'}}
+                  style={{width: '400px', margin: '10px auto'}}
                   required
                 />
               </label>
@@ -225,8 +224,8 @@ export default function Master() {
           (<Typography fontSize={"x-large"}>{index + 1}：{user.USER_NAME}</Typography>)}
         <Box className={"drac-d-flex"}>
           <Box className={"drac-text-left"} p={"xs"}>HP :
-            {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"30px"}
-                                                                    style={{marginTop: "0px", marginLeft: "10px"}}
+            {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"25px"}
+                                                                    style={{marginTop: "0px", marginLeft: "4px"}}
                                                                     key={`life_${user.USER_ID}_${lifeIndex}`}
                                                                     className={(lifeIndex < (user.HP + usersLife[index]) ? "life_img" : "life_img_dead") + " pointer"}
                                                                     onClick={() => {
@@ -312,7 +311,7 @@ export default function Master() {
         flexDirection: "row",
         flexWrap: "wrap",
         width: "700px",
-        resize: "both",
+        // resize: "both",
         margin: "30px auto"
       }}>
         {users.length > 0 && users[0].ROLE === null &&
@@ -338,7 +337,7 @@ export default function Master() {
               ))}
             </Grid>
           ) :
-          <form>
+          <form style={{width: "100%", margin: "auto"}}>
             <>プレイヤーの名前を入力</>
             <InputPlayerNames/>
             <Button m={"xs"} onClick={(event) => {
@@ -355,7 +354,7 @@ export default function Master() {
       {/*<div>*/}
       {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
       {/*</div>*/}
-      <Box mb={"lg"} style={{marginBottom: "80px"}}></Box>
+      <Box mb={"lg"} style={{marginBottom: "200px"}}></Box>
     </Box>
   );
 }
@@ -364,11 +363,11 @@ export default function Master() {
 function Flex(props) {
   return (
     <div style={{
-      display: "flex",
-      flexDirection: "column",
-      flexWrap: "wrap",
+      // display: "flex",
+      // flexDirection: "column",
+      // flexWrap: "wrap",
       width: "100%",
-      height: "200px",
+      height: "500px",
       margin: "auto",
     }}>{props.children}
     </div>
