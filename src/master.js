@@ -204,8 +204,7 @@ export default function Master() {
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
               <Paper className={"drac-d-inline-flex"}
-                     sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}}
-                     color={TeamInfo[user.TEAM].Color}>
+                     sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}}>
                 <Typography variant={"h6"} color={user.HP > 0 ? "black" : "red"}
                             className={"text-outline drac-d-inline"}>
                   ［{RoleInfo[user.ROLE]}］{user.USER_NAME}
@@ -292,7 +291,7 @@ export default function Master() {
       {/*<PopupOnCursor/>*/}
       <Box className={"Controller"}>
         <Button onClick={toggleTeamOrder}>
-          並び順変更
+          並び替え
         </Button>
         <Button
           ref={submitRef}
@@ -302,7 +301,7 @@ export default function Master() {
         <Button onClick={getActionLog}>ログ再取得</Button>
         {users.length > 0 ?
           <Button onClick={OnNextPhase} mx={"auto"}>
-            {roomInfo.DAY > 0 ? <>フェイズを進める</> : <>開始</>}
+            {roomInfo.DAY > 0 ? <>進める</> : <>開始</>}
           </Button> : ''}
       </Box>
       <PhaseDisplay roomInfo={roomInfo}/>

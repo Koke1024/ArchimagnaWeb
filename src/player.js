@@ -5,7 +5,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {ActionInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./utils/ArchiMagnaDefine";
 import {
   Checkbox,
-  Grid,
+  Grid, Paper,
   Typography
 } from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
@@ -13,6 +13,7 @@ import {RoomContext, UsersContext} from "./App";
 import {Box, Button} from "dracula-ui";
 import {CustomInput, CustomMenu, CustomMenuItem, CustomListItemText} from "./component/Design";
 import ConfirmDialog from './component/Dialog';
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function Player() {
   const {users, setUsers} = useContext(UsersContext);
@@ -203,9 +204,16 @@ function Player() {
         {user.ROLE &&
           (<div>
             <Box color={TeamInfo[user.TEAM].Color} m={"xxs"}>
-              <Typography color={"black"} className={"text-outline"}>
-                ［{RoleInfo[user.ROLE]}］{user.USER_NAME}<br/>{TeamInfo[user.TEAM].Name}ツイン
-              </Typography>
+              <Paper className={"drac-d-inline-flex"}
+                     sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}}>
+                <Typography variant={"h6"} color={user.HP > 0 ? "black" : "red"}
+                            className={"text-outline drac-d-inline"}>
+                  ［{RoleInfo[user.ROLE]}］{user.USER_NAME}
+                </Typography>
+              </Paper>
+              <Box color={"black"}>
+                <span>{TeamInfo[user.TEAM].Name}ツイン</span>
+              </Box>
             </Box>
           </div>)}
         {!user.ROLE &&
