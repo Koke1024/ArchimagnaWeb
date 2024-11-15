@@ -107,12 +107,6 @@ export default function Master() {
     })
   }
 
-  const handleInputChange = (index, value) => {
-    const newPlayerNames = [...playerNames];
-    newPlayerNames[index] = value;
-    setPlayerNames(newPlayerNames);
-  };
-
   function InputPlayerNames() {
     return (
       <Box p={"md"}>
@@ -123,9 +117,7 @@ export default function Master() {
                 <input
                   key={"name_input_text_" + index}
                   ref={(el) => (nameInputRefs.current[index] = el)}
-                  // onBlur={(e) => handleInputChange(index, e.target.value)}
                   placeholder={`Player ${index + 1}`}
-                  // value={playerNames[index]}
                   type="text"
                   style={{width: '200px', margin: '10px'}}
                   required
@@ -193,17 +185,8 @@ export default function Master() {
     if (!roomInfo?.ROOM_ID) {
       return;
     }
-    const newNames = [];
-    console.log(nameInputRefs)
-    for (let i = 0; i < nameInputRefs.current.length; ++i) {
-      newNames[i] = nameInputRefs.current[i].value;
-      if (newNames[i] === "") {
-        newNames[i] = "プレイヤー" + (i);
-      }
-    }
-
     if (roomInfo.ROOM_ID) {
-      api.AddUser(newNames, roomInfo.ROOM_ID).then(res => {
+      api.AddUser(nameInputRefs.current.map(v => v.value), roomInfo.ROOM_ID).then(res => {
         setUsers(res.data)
       })
     } else {
@@ -357,7 +340,15 @@ export default function Master() {
           <form>
             <>プレイヤーの名前を入力</>
             <InputPlayerNames/>
-            <Button m={"xs"} onClick={RegisterUsers}>プレイヤー名登録
+            <Button m={"xs"} onClick={(event) => {
+              for (let i = 0; i < nameInputRefs.current.length; ++i) {
+                if (nameInputRefs.current[i].value === "") {
+                  return;
+                }
+              }
+              event.preventDefault();
+              RegisterUsers();
+            }}>プレイヤー名登録
             </Button>
           </form>}</Box>
       {/*<div>*/}
