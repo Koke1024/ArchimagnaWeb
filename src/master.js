@@ -317,7 +317,8 @@ export default function Master() {
       }}>
         {users.length > 0 && users[0].ROLE === null &&
           (<>
-            <Button m={"lg"} onClick={() => api.SetRoleAutomated(roomInfo.ROOM_ID).then(() => {
+            <Button style={{
+              margin: "30px auto"}} m={"lg"} onClick={() => api.SetRoleAutomated(roomInfo.ROOM_ID).then(() => {
               api.GetUserList(roomInfo.ROOM_ID).then(res => {
                 setUsers(res.data)
               })
