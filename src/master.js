@@ -309,7 +309,6 @@ export default function Master() {
   }
 
   function OrderToPlayer(order){
-    console.log(users)
     return users.find(row => row.USER_ORDER === order);
   }
 
@@ -330,7 +329,6 @@ export default function Master() {
       return team1 === team2;
     }
 
-    console.dir(logList)
     let zekketsuResult =
       [ {Win: 0, Miss: 0, Lose: 0},
         {Win: 0, Miss: 0, Lose: 0},
@@ -412,14 +410,109 @@ export default function Master() {
     //
     // }
     return (
-      <>
-        <h3>{day}日目(Q{3 + day * 11 - 11}~Z{10 + day * 11 - 11})</h3>
+      <Box className={"flex"} style={{flexDirection: "column"}}>
+        <h3
+          onClick={() => navigator.clipboard.writeText(outputLog)}
+          style={{cursor: 'pointer'}}>(Q{3 + day * 11 - 11}~Z{10 + day * 11 - 11})
+          <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
-                  style={{cursor: 'pointer', width: '100%', height: '100%', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
-                  value={outputLog}
-                  onClick={() => navigator.clipboard.writeText(outputLog)}>
+                  style={{width: '40%', height: '80px', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  value={outputLog}>
         </textarea>
-      </>
+      </Box>
+    )
+  }
+  function LogTextArea2({logList, day}) {
+    if(users.length === 0){
+      return <>NOUSERS</>;
+    }
+
+    let outputLog = "";
+    let dailyLog = logList.filter(v => v.DAY === day);
+
+    //8人ID順に
+    for(let i = 0; i < 8; ++i){
+      let playerInfo = OrderToPlayer(i);
+      let playerRow = Array(2).fill("");
+      //裁定
+      let row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 5);
+      if(row) {
+        let targets = JSON.parse(row.ACTION_TARGET);
+        let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
+        playerRow[0] = target[0].USER_ORDER;
+      }
+      //戦闘
+      row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 7);
+      if(row) {
+        let targets = JSON.parse(row.ACTION_TARGET);
+        let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
+        playerRow[1] = target[0].USER_ORDER;
+      }
+      outputLog += `${playerRow.join("\t")}\r\n`;
+    }
+    // for (let i = 0;true; ++i){
+    //   if(logList.filter(v => v.DAY === i).length === 0){
+    //     break;
+    //   }
+    //
+    // }
+    return (
+      <Box className={"flex"} style={{flexDirection: "column"}}>
+        <h3
+          onClick={() => navigator.clipboard.writeText(outputLog)}
+          style={{cursor: 'pointer'}}>(AA{3 + day * 11 - 11}~AB{10 + day * 11 - 11})
+          <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
+        <textarea readOnly={true}
+                  style={{width: '40%', height: '80px', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  value={outputLog}>
+        </textarea>
+      </Box>
+    )
+  }
+  function LogTextArea3({logList, day}) {
+    if(users.length === 0){
+      return <>NOUSERS</>;
+    }
+
+    let outputLog = "";
+    let dailyLog = logList.filter(v => v.DAY === day);
+
+    //8人ID順に
+    for(let i = 0; i < 8; ++i){
+      let playerInfo = OrderToPlayer(i);
+      let playerRow = Array(10).fill("");
+      //こはく
+      let rows = dailyLog.filter(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 6);
+      Object.entries(rows).forEach(([index, row]) => {
+          let targets = JSON.parse(row.ACTION_TARGET);
+          let target = [NameToPlayer(targets[0]), targets[1]];
+          playerRow[0 + index * 4] = target[0].USER_ORDER + 1;
+          playerRow[1 + index * 4] = target[1];
+          if(RoleInfo[target[0].ROLE] === target[1]){
+            playerRow[3 + index * 4] = 4;
+          }else{
+            playerRow[3 + index * 4] = -2;
+          }
+      })
+      outputLog += `${playerRow.join("\t")}\r\n`;
+    }
+    // for (let i = 0;true; ++i){
+    //   if(logList.filter(v => v.DAY === i).length === 0){
+    //     break;
+    //   }
+    //
+    // }
+    return (
+      <Box className={"flex"} style={{flexDirection: "column"}}>
+        <h3
+          onClick={() => navigator.clipboard.writeText(outputLog)}
+          style={{cursor: 'pointer'}}>(AE{3 + day * 11 - 11}~AP{10 + day * 11 - 11})
+          <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
+        <textarea readOnly={true}
+                  style={{width: '40%', height: '80px', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  value={outputLog}>
+        </textarea>
+      </Box>
     )
   }
 
@@ -490,7 +583,17 @@ export default function Master() {
           </form>}</Box>
 
       {Array(roomInfo.DAY).fill(null).map(
-        (_, index) => (<LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>)
+        (_, index) => {
+          return (
+          <>
+            <h2>{index + 1}日目</h2>
+            <Box className={"drac-d-inline-flex"}>
+            <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
+            <LogTextArea2 key={"logArea2_" + (index + 1)} logList={actionLog} day={index + 1}/>
+            <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
+          </Box>
+          </>)
+        }
       )}
       {/*<div>*/}
       {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
