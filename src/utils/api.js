@@ -16,7 +16,7 @@ class ApiClass{
     })
 
   }
-  AddUser(names, roomId){
+  AddUser(names, roomId, order){
     let param = {
       USER_NAMES: names,
       ROOM_ID: roomId,
@@ -27,7 +27,7 @@ class ApiClass{
   GetUserList(roomId){
     let param = {
       ROOM_ID: roomId,
-      ALL: false
+      MASTER: true
     }
     console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});
@@ -36,7 +36,7 @@ class ApiClass{
   GetUserNames(roomId){
     let param = {
       ROOM_ID: roomId,
-      ALL: true
+      MASTER: false
     }
     console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});

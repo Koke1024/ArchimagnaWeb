@@ -37,13 +37,13 @@ export const ActionInfo = {
   6: {ID: 6, Name: "呼剥", Role: [1,2,3,4,5,6,7,8], Phase: [5], Target: 2, Mana: 1, Description: "自分以外の脱落していない PC を指定し対象の精霊を記述する。的中していた場合、対象の魔力を半減さ\n" +
       "せたうえで ( 端数切り上げ ) 魔力を 4 獲得する。間違っていた場合、魔力を 2 失う。"},
   7: {ID: 7, Name: "戦闘", Role: [1,2,3,4,5,6,7,8], Phase: [7], Target: 1, Mana: 1, Description: "魔力を使用して自身の精霊の戦闘力を高めて攻撃を行う。"},
-  8: {ID: 8, Name: "絶結", Role: [1,2,3,4], Phase: [3], Target: 2, Mana: 1, Description: "生存している二名を指定する。二人がツインであった場合、対象のアーヴのライフを 1, アルカ\n" +
+  8: {ID: 8, Name: "絶結", Role: [1,2,3,4], Phase: [3], Target: 2, Mana: 0, Description: "生存している二名を指定する。二人がツインであった場合、対象のアーヴのライフを 1, アルカ\n" +
       "ナの魔力を 8 減少させたうえで、自身の魔力を 6 増加させる。失敗した場合、魔力が 6 減少する。"},
-  9: {ID: 9, Name: "GM：HP操作", Role: [0], Phase: [], Target: true, Mana: 1, Description: ""},
-  10: {ID: 10, Name: "GM：魔力操作", Role: [0], Phase: [], Target: true, Mana: 1, Description: ""},
+  9: {ID: 9, Name: "GM：HP操作", Role: [0], Phase: [], Target: true, Mana: 0, Description: ""},
+  10: {ID: 10, Name: "GM：魔力操作", Role: [0], Phase: [], Target: true, Mana: 0, Description: ""},
   11: {ID: 11, Name: "使い魔", Role: [], Phase: [3], Target: 1, Mana: 1, Description: "魔力を 1 支払う。任意の人物に文章を送る。"},
-  12: {ID: 12, Name: "命約", Role: [], Phase: [1,2], Target: 8, Mana: 1, Description: ""},
-  13: {ID: 13, Name: "護衛", Role: [5,6,7,8], Phase: [3], Target: 0, Mana: 1, Description: "魔力を 5 支払う。その日のアルカナの精霊が命約違反によるダメージ以外で死亡する際、代わ\n" +
+  12: {ID: 12, Name: "命約", Role: [], Phase: [1,2], Target: 8, Mana: 0, Description: ""},
+  13: {ID: 13, Name: "護衛", Role: [5,6,7,8], Phase: [3], Target: 0, Mana: 5, Description: "魔力を 5 支払う。その日のアルカナの精霊が命約違反によるダメージ以外で死亡する際、代わ\n" +
       "りに自身の精霊を死亡させる。"},
 }
 

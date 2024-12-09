@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     if (!USER_NAMES || !ROOM_ID) return res.status(400).json({ error: 'USER_NAMES and ROOM_ID are required' });
 
     try {
-      const users = USER_NAMES.map(name => ({ USER_NAME: name, ROOM_ID }));
+      const users = USER_NAMES.map((name, index) => ({ USER_NAME: name, ROOM_ID, USER_ORDER: index }));
       console.log(db('USER_TBL').insert(users).toSQL())
       await db('USER_TBL').insert(users);
       const updatedUsers = await db('USER_TBL').select('*').where({ ROOM_ID });

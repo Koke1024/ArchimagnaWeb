@@ -18,6 +18,7 @@ export default function Master() {
   const usersLife = useRef(Array(8).fill(0));
   const nameInputRefs = useRef([]);
   const manaAddInputRefs = useRef([]);
+  const autoReloadOnTeam = useRef(null);
   const [isTeamOrder, setTeamOrder] = useState(false);
   const {token} = useParams();
   const location = useLocation();
@@ -44,12 +45,24 @@ export default function Master() {
 
   useEffect(() => {
     getActionLog();
-    console.dir(nameInputRefs.current)
   }, [upd])
 
   const toggleTeamOrder = () => {
     setTeamOrder(v => !v);
   }
+
+  useEffect(() => {
+    console.log("autoReloadOnTeam")
+    //陣営会議中は3秒ごとにリロード
+    if(roomInfo.PHASE === 3){
+      autoReloadOnTeam.current = setInterval(() => {
+        getActionLog()
+      }, 3000);
+    }else if(autoReloadOnTeam.current !== null){
+      clearInterval(autoReloadOnTeam.current);
+      autoReloadOnTeam.current = null;
+    }
+  }, [roomInfo.PHASE])
 
   useEffect(() => {
     if (token) {
@@ -90,7 +103,7 @@ export default function Master() {
       console.log("no room id");
       return;
     }
-    var _users = users;
+    let _users = users;
     for (let i = 0; i < _users.length; ++i) {
       console.log(manaAddInputRefs.current[i].value)
       _users[i].MANA = +(manaAddInputRefs.current[i].value) ?? 0;
@@ -115,6 +128,7 @@ export default function Master() {
               <label>
                 <input
                   key={"name_input_text_" + index}
+                  id={"name_input_text_" + index}
                   ref={(el) => (nameInputRefs.current[index] = el)}
                   placeholder={`Player ${index + 1}`}
                   type="text"
@@ -158,7 +172,7 @@ export default function Master() {
         <>
           <div style={{margin: "10px"}}>GM用URL</div>
           <Box onClick={CopyUrl} className={"drac-d-flex"} style={{margin: "auto", width: "50%", cursor: 'pointer'}}>
-            <input readOnly={true} type={"text"} style={{cursor: 'pointer'}} value={fullPath}></input>
+            <input id={"gm_url"} readOnly={true} type={"text"} style={{cursor: 'pointer'}} value={fullPath}></input>
             <ContentCopyIcon color={"gray"} style={{marginLeft: "-40px", marginTop: "8px"}}/>
           </Box>
           <div style={{margin: "10px"}}>URLを紛失しないようにしてください。</div>
@@ -175,7 +189,7 @@ export default function Master() {
   }
 
   const openPlayerPage = (user_id, token) => {
-    var link = playerUrl(user_id, token);
+    let link = playerUrl(user_id, token);
     console.log(link)
     navigate(link);
   }
@@ -195,7 +209,7 @@ export default function Master() {
 
   const PlayerInformation = (props) => {
     const [user,] = useState(props.player);
-    var index = props.index;
+    let index = props.index;
 
     return <Grid key={"player_info_" + user.USER_ID} container spacing={"xxs"} className={"Square"}>
       {/*名前*/}
@@ -247,6 +261,7 @@ export default function Master() {
             魔力 ： <Typography className={"drac-d-inline"} color={"white"}
                                fontSize={"x-large"}>{user.MANA}</Typography> +
             <input
+              id={"mana_input_" + index}
               ref={(el) => (manaAddInputRefs.current[index] = el)}
               defaultValue={manaAddInputRefs.current[index]}
               type="number"
@@ -287,6 +302,125 @@ export default function Master() {
         navigate('/');
       }
     })
+  }
+
+  function NameToPlayer(name){
+    return users.find(row => row.USER_NAME === name);
+  }
+
+  function OrderToPlayer(order){
+    console.log(users)
+    return users.find(row => row.USER_ORDER === order);
+  }
+
+  function IDToPlayer(order){
+    return users.find(row => row.USER_ID === order);
+  }
+
+  function LogTextArea({logList, day}) {
+    if(users.length === 0){
+      return <>NOUSERS</>;
+    }
+    function IsTwinCheck(pl1, pl2) {
+      let team1 = pl1?.TEAM;
+      let team2 = pl2?.TEAM;
+      if(team1 === null || team2 === null){
+        return false;
+      }
+      return team1 === team2;
+    }
+
+    console.dir(logList)
+    let zekketsuResult =
+      [ {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+        {Win: 0, Miss: 0, Lose: 0},
+      ];
+    let outputLog = "";
+    let dailyLog = logList.filter(v => v.DAY === day);
+    //絶結成否を先に全部計算
+    let zekketsuLog = dailyLog.filter(v => v.ACTION_ID === 8);
+    zekketsuLog.forEach(row => {
+      let targets = JSON.parse(row.ACTION_TARGET);
+      var me = IDToPlayer(row.USER_ID);
+      var t0 = NameToPlayer(targets[0]);
+      var t1 = NameToPlayer(targets[1]);
+      if(IsTwinCheck(t0, t1)){
+        zekketsuResult[t0.USER_ORDER]["Lose"] += 1;
+        zekketsuResult[t1.USER_ORDER]["Lose"] += 1;
+
+        zekketsuResult[me.USER_ORDER]["Win"] += 1;
+      }else{
+        zekketsuResult[me.USER_ORDER]["Miss"] += 1;
+      }
+    })
+
+    //8人ID順に
+    for(let i = 0; i < 8; ++i){
+      let playerInfo = OrderToPlayer(i);
+      let playerRow = Array(10).fill("");
+      let row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 8);
+      if(row) {  //絶結使用
+        let targets = JSON.parse(row.ACTION_TARGET);
+        let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
+        playerRow[0] = target[0].USER_ORDER;
+        playerRow[1] = target[1].USER_ORDER;
+      }
+      playerRow[2] = (zekketsuResult[i]["Win"] * 6)
+      playerRow[3] = (zekketsuResult[i]["Miss"] * -6);
+      if(playerInfo.ROLE <= 4){
+        playerRow[3] += (zekketsuResult[i]["Lose"] * -8);
+      }else{
+        playerRow[4] += (zekketsuResult[i]["Lose"] * -1);
+      }
+
+      //護衛：-5
+      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 13)){
+        playerRow[5] = -5;
+      }
+      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 1)){
+        playerRow[6] = "察";
+        playerRow[7] = -1;
+      }
+      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 2)){
+        playerRow[6] = "凝";
+        playerRow[7] = -4;
+      }
+      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 3)){
+        playerRow[6] = "忠";
+        playerRow[7] = -4;
+      }
+      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 4)){
+        playerRow[6] = "見";
+        playerRow[7] = -1;
+      }
+      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 11)){
+        playerRow[8] = "t";
+        playerRow[9] = -1;
+      }
+      outputLog += `${playerRow.join("\t")}\r\n`;
+    }
+    // for (let i = 0;true; ++i){
+    //   if(logList.filter(v => v.DAY === i).length === 0){
+    //     break;
+    //   }
+    //
+    // }
+    return (
+      <>
+        <h3>{day}日目(Q{3 + day * 11 - 11}~Z{10 + day * 11 - 11})</h3>
+        <textarea readOnly={true}
+                  style={{cursor: 'pointer', width: '100%', height: '100%', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  value={outputLog}
+                  onClick={() => navigator.clipboard.writeText(outputLog)}>
+        </textarea>
+      </>
+    )
   }
 
   return (
@@ -354,6 +488,10 @@ export default function Master() {
             }}>プレイヤー名登録
             </Button>
           </form>}</Box>
+
+      {Array(roomInfo.DAY).fill(null).map(
+        (_, index) => (<LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>)
+      )}
       {/*<div>*/}
       {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
       {/*</div>*/}
