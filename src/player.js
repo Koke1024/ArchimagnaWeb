@@ -28,6 +28,8 @@ function Player() {
   const selectedTargets = useRef([]);
   const location = useLocation();
   const [openDialog, setOpenDialog] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
+  const warningParameter = useRef({});
 
   const handleOpen = () => {
     setOpenDialog(true); // ダイアログを開く
@@ -353,6 +355,22 @@ function Player() {
                         if ((inputAction === 11 || inputAction === 12)) {
                           selectedTargets.current = Object.values({actionValue, ...selectedTargets.current});
                         }
+                        if(inputAction === 6){
+                          if(actionLog.find(r => r.ACTION_ID === 6 && JSON.parse(r.ACTION_TARGET)[0] === selectedTargets.current[0])){
+                            console.log("同一対象に呼剥使用済み");
+                            setShowWarning(true);
+                            warningParameter.current = {title: "", message: "同じプレイヤーに複数回呼剥を行うことはできません。"}
+                            return;
+                          }
+                        }
+                        if(inputAction === 8){
+                          if(actionLog.find(r => r.ACTION_ID === 8)){
+                            console.log("絶結使用済み");
+                            setShowWarning(true);
+                            warningParameter.current = {title: "", message: "絶結はゲーム中一度しか行えません。"}
+                            return;
+                          }
+                        }
                         api.SendAction(myInfo.USER_ID, inputAction, JSON.stringify(selectedTargets.current), roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
                           setInputAction(0);
                           selectedTargets.current = [];
@@ -374,6 +392,14 @@ function Player() {
           </Box>
         </Grid>
       </Grid>
+        <ConfirmDialog
+        open={showWarning}
+        onClose={() => {setShowWarning(false); warningParameter.current = {};}}
+        title={warningParameter.current.title}
+        onConfirm={() => {setShowWarning(false); warningParameter.current = {};}}
+        message={warningParameter.current.message}
+        simple={true}
+      />
       {/*<Header/>*/}
 
     </Box>
