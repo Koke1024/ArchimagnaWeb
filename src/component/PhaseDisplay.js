@@ -46,7 +46,7 @@ export const PlayerLog = (props) => {
   const [user, log] = [props.player, props.log]
 
   if (!log || log.length === 0) {
-    return <>NO LOG</>;
+    return (<Box key={"user_action_log_box_" + user.USER_ID} className={"Log"}>NO LOG</Box>);
   }
   let day = -1;
 

@@ -352,12 +352,12 @@ function Player() {
                     onConfirm={() => {
                       handleConfirm(() => {
                         if (inputAction === 7) {
-                          selectedTargets.current[1] = actionValue;
-                          if(actionValue.length === 0 || parseInt(selectedTargets.current[1]) < 1){
+                          if(actionValue.length === 0 || parseInt(actionValue) < 1){
                             setShowWarning(true);
                             warningParameter.current = {title: "", message: "攻撃には1以上の魔力の消費が必要です。"}
                             return;
                           }
+                          selectedTargets.current[1] = actionValue;
                         }
                         if ((inputAction === 11 || inputAction === 12)) {
                           selectedTargets.current = Object.values({actionValue, ...selectedTargets.current});
