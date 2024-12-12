@@ -229,7 +229,7 @@ export default function Master() {
                 </div>
               </Paper>
               <Box color={"black"}>
-                <span>{TeamInfo[user.TEAM].Name}ツイン</span>
+                <span>{TeamInfo[user.TEAM].Name}ツイン・{user.ROLE <= 4? "主": "従"}</span>
               </Box>
             </Box>
           </div>)}
@@ -401,54 +401,23 @@ export default function Master() {
         playerRow[8] = "t";
         playerRow[9] = -1;
       }
-      outputLog += `${playerRow.join("\t")}\r\n`;
-    }
-    return (
-      <Box className={"flex"} style={{flexDirection: "column"}}>
-        <h3
-          onClick={() => navigator.clipboard.writeText(outputLog)}
-          style={{cursor: 'pointer'}}>(Q{3 + day * 11 - 11}~Z{10 + day * 11 - 11})
-          <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
-        <textarea readOnly={true}
-                  className={"CopyTextArea"}
-                  value={outputLog}>
-        </textarea>
-      </Box>
-    )
-  }
-  function LogTextArea2({logList, day}) {
-    if(users.length === 0){
-      return <></>;
-    }
 
-    let outputLog = "";
-    let dailyLog = logList.filter(v => v.DAY === day);
-
-    //8人ID順に
-    for(let i = 0; i < 8; ++i){
-      let playerInfo = OrderToPlayer(i);
-      let playerRow = Array(2).fill("");
       //裁定
-      let row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 5);
+      row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 5);
       if(row) {
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
-        playerRow[0] = target[0].USER_ORDER + 1;
+        playerRow[10] = target[0].USER_ORDER + 1;
+        playerRow[11] = target[1].USER_ORDER + 1;
       }
-      //戦闘
-      row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 7);
-      if(row) {
-        let targets = JSON.parse(row.ACTION_TARGET);
-        let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
-        playerRow[1] = target[0].USER_ORDER + 1;
-      }
+
       outputLog += `${playerRow.join("\t")}\r\n`;
     }
     return (
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
           onClick={() => navigator.clipboard.writeText(outputLog)}
-          style={{cursor: 'pointer'}}>(AA{3 + day * 11 - 11}~AB{10 + day * 11 - 11})
+          style={{cursor: 'pointer'}}>(Q{3 + day * 11 - 11}~AB{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
                   className={"CopyTextArea"}
@@ -474,12 +443,12 @@ export default function Master() {
       Object.entries(rows).forEach(([index, row]) => {
           let targets = JSON.parse(row.ACTION_TARGET);
           let target = [NameToPlayer(targets[0]), targets[1]];
-          playerRow[0 + index * 4] = target[0].USER_ORDER + 1;
-          playerRow[1 + index * 4] = target[1];
+          playerRow[0 + index * 3] = target[0].USER_ORDER + 1;
+          playerRow[1 + index * 3] = target[1];
           if(RoleInfo[target[0].ROLE] === target[1]){
-            playerRow[3 + index * 4] = 4;
+            playerRow[2 + index * 3] = 4;
           }else{
-            playerRow[3 + index * 4] = -2;
+            playerRow[2 + index * 3] = -2;
           }
       })
       outputLog += `${playerRow.join("\t")}\r\n`;
@@ -488,7 +457,7 @@ export default function Master() {
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
           onClick={() => navigator.clipboard.writeText(outputLog)}
-          style={{cursor: 'pointer'}}>(AE{3 + day * 11 - 11}~AP{10 + day * 11 - 11})
+          style={{cursor: 'pointer'}}>(AE{3 + day * 11 - 11}~AM{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
                   className={"CopyTextArea"}
@@ -606,7 +575,6 @@ export default function Master() {
             <h2>{index + 1}日目</h2>
             <Box className={"drac-d-inline-flex"}>
             <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
-            <LogTextArea2 key={"logArea2_" + (index + 1)} logList={actionLog} day={index + 1}/>
             <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
             <LogTextArea4 key={"logArea4_" + (index + 1)} logList={actionLog} day={index + 1}/>
           </Box>
