@@ -201,3 +201,15 @@ input{
   background: transparent;
   background-color: rgb(0, 0, 0);
 }
+
+.CopyTextArea{
+  width: 100px;
+  height: 80px;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 10px;
+  margin: 0 30px;
+  background-color: var(--blackTernary);
+  color: var(--blackSecondary);
+}

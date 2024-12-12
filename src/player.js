@@ -246,7 +246,7 @@ function Player() {
   }
 
   return (
-    <Box className="App" style={{width: "700px"}} m={"auto"}>
+    <Box className="App" style={{width: "700px", paddingBottom: "100px"}} m={"auto"}>
       <header className="App-header">
         <h1 style={{paddingTop: "30px"}}>ArchiMagna</h1>
         <h2 style={{margin: "10px"}}>プレイヤー用ページ</h2>
@@ -300,6 +300,8 @@ function Player() {
             {EnableAction().map(r => {
               return <Grid item key={"action_" + r[0]} xs={2}>
                 <Button
+                  style={(IsActiveAction(r[1].ID) && r[1].ID === inputAction)? {borderStyle: "solid", borderWidth: "5px", borderColor: "white"}: {}}
+                  // style={IsActiveAction(r[1].ID) === inputAction? {borderStyle: "solid", borderWidth: "5px", borderColor: "white"}: {}}
                   variant={IsActiveAction(r[1].ID) ? "normal" : "ghost"}
                   disabled={!IsActiveAction(r[1].ID)}
                   onClick={() => {
@@ -338,9 +340,9 @@ function Player() {
               </Grid> : <></>
             }
             <Grid item xs={12}>
-              {(inputAction !== 0) ?
+              {(inputAction !== 0 && IsActiveAction(inputAction)) ?
                 <>
-                  <Button variant="contained" color="red" onClick={handleOpen}>
+                  <Button variant="contained" color="red" onClick={handleOpen} disabled={TargetSelectFormat(selectedTargets.current, inputAction, actionValue).includes("?")}>
                     {TargetSelectFormat(selectedTargets.current, inputAction, actionValue)}
                   </Button>
                   <ConfirmDialog
@@ -351,6 +353,11 @@ function Player() {
                       handleConfirm(() => {
                         if (inputAction === 7) {
                           selectedTargets.current[1] = actionValue;
+                          if(actionValue.length === 0 || parseInt(selectedTargets.current[1]) < 1){
+                            setShowWarning(true);
+                            warningParameter.current = {title: "", message: "攻撃には1以上の魔力の消費が必要です。"}
+                            return;
+                          }
                         }
                         if ((inputAction === 11 || inputAction === 12)) {
                           selectedTargets.current = Object.values({actionValue, ...selectedTargets.current});

@@ -221,7 +221,7 @@ export default function Master() {
                      sx={{borderRadius: "10px", padding: "0 10px", backgroundColor: TeamInfo[user.TEAM].Color}}>
                 <Typography variant={"h6"} color={user.HP > 0 ? "black" : "red"}
                             className={"text-outline drac-d-inline"}>
-                  ［{RoleInfo[user.ROLE]}］{user.USER_NAME}
+                  {user.USER_ORDER + 1}［{RoleInfo[user.ROLE]}］{user.USER_NAME}
                 </Typography>
                 <div className={"pointer"} color="gray" title={"プレイヤー用URLをクリップボードにコピー"}
                      onClick={() => CopyText(`${user.USER_NAME}：` + playerFullUrl(user.USER_ID, user.TOKEN))}>
@@ -318,7 +318,7 @@ export default function Master() {
 
   function LogTextArea({logList, day}) {
     if(users.length === 0){
-      return <>NOUSERS</>;
+      return <></>;
     }
     function IsTwinCheck(pl1, pl2) {
       let team1 = pl1?.TEAM;
@@ -366,8 +366,8 @@ export default function Master() {
       if(row) {  //絶結使用
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
-        playerRow[0] = target[0].USER_ORDER;
-        playerRow[1] = target[1].USER_ORDER;
+        playerRow[0] = target[0].USER_ORDER + 1;
+        playerRow[1] = target[1].USER_ORDER + 1;
       }
       playerRow[2] = (zekketsuResult[i]["Win"] * 6)
       playerRow[3] = (zekketsuResult[i]["Miss"] * -6);
@@ -416,7 +416,7 @@ export default function Master() {
           style={{cursor: 'pointer'}}>(Q{3 + day * 11 - 11}~Z{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
-                  style={{width: '40%', height: '80px', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  className={"CopyTextArea"}
                   value={outputLog}>
         </textarea>
       </Box>
@@ -424,7 +424,7 @@ export default function Master() {
   }
   function LogTextArea2({logList, day}) {
     if(users.length === 0){
-      return <>NOUSERS</>;
+      return <></>;
     }
 
     let outputLog = "";
@@ -439,14 +439,14 @@ export default function Master() {
       if(row) {
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
-        playerRow[0] = target[0].USER_ORDER;
+        playerRow[0] = target[0].USER_ORDER + 1;
       }
       //戦闘
       row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 7);
       if(row) {
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
-        playerRow[1] = target[0].USER_ORDER;
+        playerRow[1] = target[0].USER_ORDER + 1;
       }
       outputLog += `${playerRow.join("\t")}\r\n`;
     }
@@ -463,7 +463,7 @@ export default function Master() {
           style={{cursor: 'pointer'}}>(AA{3 + day * 11 - 11}~AB{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
-                  style={{width: '40%', height: '80px', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  className={"CopyTextArea"}
                   value={outputLog}>
         </textarea>
       </Box>
@@ -471,7 +471,7 @@ export default function Master() {
   }
   function LogTextArea3({logList, day}) {
     if(users.length === 0){
-      return <>NOUSERS</>;
+      return <></>;
     }
 
     let outputLog = "";
@@ -509,7 +509,7 @@ export default function Master() {
           style={{cursor: 'pointer'}}>(AE{3 + day * 11 - 11}~AP{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
-                  style={{width: '40%', height: '80px', resize: 'none', border: 'none', outline: 'none', padding: '10px', backgroundColor: 'var(--blackTernary)', color: 'var(--blackSecondary)'}}
+                  className={"CopyTextArea"}
                   value={outputLog}>
         </textarea>
       </Box>
@@ -598,7 +598,7 @@ export default function Master() {
       {/*<div>*/}
       {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
       {/*</div>*/}
-      <Box mb={"lg"} style={{marginBottom: "200px"}}></Box>
+      <Box mb={"lg"} style={{paddingBottom: "200px"}}></Box>
     </Box>
   );
 }
