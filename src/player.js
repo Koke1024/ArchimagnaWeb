@@ -380,6 +380,7 @@ function Player() {
                         }
                         api.SendAction(myInfo.USER_ID, inputAction, JSON.stringify(selectedTargets.current), roomInfo.DAY, roomInfo.ROOM_ID).then(res => {
                           setInputAction(0);
+                          setActionValue("");
                           selectedTargets.current = [];
                           setUpd(v => v + 1);
                           getActionLog();

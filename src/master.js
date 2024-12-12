@@ -403,12 +403,6 @@ export default function Master() {
       }
       outputLog += `${playerRow.join("\t")}\r\n`;
     }
-    // for (let i = 0;true; ++i){
-    //   if(logList.filter(v => v.DAY === i).length === 0){
-    //     break;
-    //   }
-    //
-    // }
     return (
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
@@ -450,12 +444,6 @@ export default function Master() {
       }
       outputLog += `${playerRow.join("\t")}\r\n`;
     }
-    // for (let i = 0;true; ++i){
-    //   if(logList.filter(v => v.DAY === i).length === 0){
-    //     break;
-    //   }
-    //
-    // }
     return (
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
@@ -496,17 +484,46 @@ export default function Master() {
       })
       outputLog += `${playerRow.join("\t")}\r\n`;
     }
-    // for (let i = 0;true; ++i){
-    //   if(logList.filter(v => v.DAY === i).length === 0){
-    //     break;
-    //   }
-    //
-    // }
     return (
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
           onClick={() => navigator.clipboard.writeText(outputLog)}
           style={{cursor: 'pointer'}}>(AE{3 + day * 11 - 11}~AP{10 + day * 11 - 11})
+          <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
+        <textarea readOnly={true}
+                  className={"CopyTextArea"}
+                  value={outputLog}>
+        </textarea>
+      </Box>
+    )
+  }
+  function LogTextArea4({logList, day}) {
+    if(users.length === 0){
+      return <></>;
+    }
+
+    let outputLog = "";
+    let dailyLog = logList.filter(v => v.DAY === day);
+
+    //8人ID順に
+    for(let i = 0; i < 8; ++i){
+      let playerInfo = OrderToPlayer(i);
+      let playerRow = Array(2).fill("");
+      //戦闘力
+      let row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 7);
+      if(row) {
+        let targets = JSON.parse(row.ACTION_TARGET);
+        let target = [NameToPlayer(targets[0]), targets[1]];
+        playerRow[0] = target[1];
+        playerRow[1] = target[0].USER_ORDER + 1;;
+      }
+      outputLog += `${playerRow.join("\t")}\r\n`;
+    }
+    return (
+      <Box className={"flex"} style={{flexDirection: "column"}}>
+        <h3
+          onClick={() => navigator.clipboard.writeText(outputLog)}
+          style={{cursor: 'pointer'}}>(AS{3 + day * 11 - 11}~AT{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
                   className={"CopyTextArea"}
@@ -591,6 +608,7 @@ export default function Master() {
             <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
             <LogTextArea2 key={"logArea2_" + (index + 1)} logList={actionLog} day={index + 1}/>
             <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
+            <LogTextArea4 key={"logArea4_" + (index + 1)} logList={actionLog} day={index + 1}/>
           </Box>
           </>)
         }
