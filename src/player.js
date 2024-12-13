@@ -3,17 +3,12 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import api from "./utils/api";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {ActionInfo, RoleInfo, TargetSelectFormat, TeamInfo} from "./utils/ArchiMagnaDefine";
-import {
-  Checkbox,
-  Grid, Paper,
-  Typography
-} from "@mui/material";
+import {Checkbox, Grid, Paper, Typography} from "@mui/material";
 import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 import {Box, Button} from "dracula-ui";
-import {CustomInput, CustomMenu, CustomMenuItem, CustomListItemText} from "./component/Design";
+import {CustomInput, CustomListItemText, CustomMenu, CustomMenuItem} from "./component/Design";
 import ConfirmDialog from './component/Dialog';
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function Player() {
   const {users, setUsers} = useContext(UsersContext);
@@ -30,6 +25,7 @@ function Player() {
   const [openDialog, setOpenDialog] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
   const warningParameter = useRef({});
+  const [confirmButtonText, setConfirmButtonText] = useState("");
 
   const handleOpen = () => {
     setOpenDialog(true); // ダイアログを開く
@@ -46,11 +42,9 @@ function Player() {
 
   const getActionLog = () => {
     if (!roomInfo.ROOM_ID) {
-      console.log("no room id");
       return;
     }
     if (!myInfo.USER_ID) {
-      console.log("no user id");
       return;
     }
     api.GetUserActionLog(roomInfo.ROOM_ID, myInfo.USER_ID).then(res => {
@@ -58,6 +52,17 @@ function Player() {
       setActionLog(res.data);
     })
   }
+
+  const updateConfirmButtonText = () => {
+    if(inputAction === 0){
+      return;
+    }
+    setConfirmButtonText(TargetSelectFormat(selectedTargets.current, inputAction, actionValue));
+  }
+
+  useEffect(() => {
+    updateConfirmButtonText()
+  }, [inputAction, actionValue, selectedTargets.current]);
 
   useEffect(() => {
     if (token) {
@@ -78,13 +83,16 @@ function Player() {
     if (!userId || !token) {
       return;
     }
+    if(Object.keys(myInfo).length > 0) {
+      return;
+    }
     api.GetUserNames(userId, token).then(() => {
       api.GetUserInfo(userId, token).then(r => setMyInfo(r.data))
     })
   }, [token, userId])
 
   useEffect(() => {
-    if (!roomInfo?.ROOM_ID) {
+    if (!roomInfo?.ROOM_ID || users.length !== 0) {
       return;
     }
     api.GetUserNames(roomInfo.ROOM_ID).then(res => {
@@ -92,33 +100,9 @@ function Player() {
     })
   }, [roomInfo]);
 
-
-  function Header() {
-    const fullPath = `${window.location.origin}/gm/${roomInfo.TOKEN}/`;
-
-    function CopyUrl() {
-      navigator.clipboard.writeText(fullPath)
-        .then(() => {
-          console.log("Copied")
-        })
-        .catch((err) => {
-          console.error('コピーエラー:', err);
-        });
-    }
-
-    return <Box className="App-header" mt={"lg"}>
-      {token ?
-        <>
-          <div>GM用URL</div>
-          <input onClick={CopyUrl} style={{margin: "auto", width: "100%", cursor: 'pointer'}} readOnly={true}
-                 type={"text"}
-                 value={fullPath}></input>
-        </> : ''}
-    </Box>
-  }
-
   const MultiSelectTarget = () => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const selectUpdated = useRef(false);
     const [displayTargets, setDisplayTargets] = useState([]);
 
     const handleChange = (value) => {
@@ -128,6 +112,7 @@ function Player() {
       } else {
         selectedTargets.current = [...prevValues, value];
       }
+      selectUpdated.current = true;
       setDisplayTargets(selectedTargets.current);
     };
 
@@ -137,7 +122,10 @@ function Player() {
 
     const handleClose = () => {
       setAnchorEl(null);
-      setUpd(v => v + 1);
+      if(selectUpdated.current){
+        updateConfirmButtonText()
+        selectUpdated.current = false;
+      }
     };
 
     return (
@@ -175,7 +163,7 @@ function Player() {
               <CustomListItemText primary={user.USER_NAME}/>
             </CustomMenuItem>
           ))}
-          {RoleInfo && Object.values(RoleInfo).map(role => (
+          {inputAction === 6 && RoleInfo && Object.values(RoleInfo).map(role => (
             <CustomMenuItem key={"role_select_" + role} value={role}
                             onClick={(event) => {
                               event.stopPropagation();
@@ -252,7 +240,11 @@ function Player() {
         <h2 style={{margin: "10px"}}>プレイヤー用ページ</h2>
         <PhaseDisplay roomInfo={roomInfo}/>
         <Grid item xs={12} mt={"10px"}>
-          <Button onClick={() => setUpd(v => v + 1)}>情報更新</Button>
+          <Button onClick={() => {
+            selectedTargets.current = [];
+            setUpd(v => v + 1)
+          }
+          }>情報更新</Button>
         </Grid>
         <Box style={{
           display: "flex",
@@ -343,7 +335,7 @@ function Player() {
               {(inputAction !== 0 && IsActiveAction(inputAction)) ?
                 <>
                   <Button variant="contained" color="red" onClick={handleOpen} disabled={TargetSelectFormat(selectedTargets.current, inputAction, actionValue).includes("?")}>
-                    {TargetSelectFormat(selectedTargets.current, inputAction, actionValue)}
+                    {confirmButtonText}
                   </Button>
                   <ConfirmDialog
                     open={openDialog}
@@ -369,6 +361,12 @@ function Player() {
                             warningParameter.current = {title: "", message: "同じプレイヤーに複数回呼剥を行うことはできません。"}
                             return;
                           }
+
+                          if(Object.values(RoleInfo).includes(selectedTargets.current[0])){
+                            setShowWarning(true);
+                            warningParameter.current = {title: "", message: "「（PC名）の精霊は（精霊名）である」の形式で入力してください。"}
+                            return;
+                          }
                         }
                         if(inputAction === 8){
                           if(actionLog.find(r => r.ACTION_ID === 8)){
@@ -387,7 +385,7 @@ function Player() {
                         })
                       })
                     }}
-                    message={TargetSelectFormat(selectedTargets.current, inputAction, actionValue)}
+                    message={confirmButtonText}
                   />
                 </>
                 : <></>}

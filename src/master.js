@@ -52,7 +52,6 @@ export default function Master() {
   }
 
   useEffect(() => {
-    console.log("autoReloadOnTeam")
     //陣営会議中は3秒ごとにリロード
     if(roomInfo.PHASE === 3){
       autoReloadOnTeam.current = setInterval(() => {
@@ -90,7 +89,6 @@ export default function Master() {
 
   const getActionLog = () => {
     if (!roomInfo.ROOM_ID) {
-      console.log("no room id");
       return;
     }
     api.GetActionLog(roomInfo.ROOM_ID).then(res => {
@@ -100,7 +98,6 @@ export default function Master() {
 
   const updateUserInfo = () => {
     if (!roomInfo.ROOM_ID) {
-      console.log("no room id");
       return;
     }
     let _users = users;
@@ -145,7 +142,8 @@ export default function Master() {
   if (!token) {
     return <div className="App">
       <Header/>
-        <Button m={"xs"} onClick={() => api.CreateRoom().then(r => {
+        <Button
+          m={"lg"} onClick={() => api.CreateRoom().then(r => {
           console.log(r)
           navigate("/gm/" + r.data.TOKEN);
         })}>新規ルームの作成
