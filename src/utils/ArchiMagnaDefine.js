@@ -1,8 +1,8 @@
 export const TeamInfo = {
   1: {Color: "#FF8888", Name: "崩滅"},
   2: {Color: "#BBBBBB", Name: "擁衛"},
-  3: {Color: "#5588FF", Name: "佑寵"},
-  4: {Color: "#88FF88", Name: "断淵"},
+  3: {Color: "#0096ff", Name: "佑寵"},
+  4: {Color: "#b45bfd", Name: "断淵"},
 }
 
 export const PhaseInfo = {

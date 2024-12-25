@@ -27,16 +27,17 @@ class ApiClass{
   GetUserList(roomId){
     let param = {
       ROOM_ID: roomId,
-      MASTER: true
+      MASTER: 1
     }
     console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});
   }
 
-  GetUserNames(roomId){
+  GetUserNames(roomId, userToken){
     let param = {
       ROOM_ID: roomId,
-      MASTER: false
+      TOKEN: userToken,
+      MASTER: 0
     }
     console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});

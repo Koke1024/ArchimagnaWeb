@@ -41,18 +41,21 @@ PhaseDisplay.propTypes = {
   roomInfo: PropTypes.object.isRequired,
 };
 
-
 export const PlayerLog = (props) => {
-  const [user, log] = [props.player, props.log]
+  const [user, log, users] = [props.player, props.log, props.users]
+  function IDToPlayer(id){
+    return users.find(row => row.USER_ID === id);
+  }
 
   if (!log || log.length === 0) {
     return (<Box key={"user_action_log_box_" + user.USER_ID} className={"Log"}>NO LOG</Box>);
   }
   let day = -1;
+  log.reverse();
 
   return (<Box key={"user_action_log_box_" + user.USER_ID} className={"Log"}
   >
-    {log && log.map(r => {
+    {log && log.slice().reverse().map(r => {
         var args = JSON.parse(r.ACTION_TARGET);
         let dayString;
         if (day !== r.DAY) {
@@ -61,7 +64,9 @@ export const PlayerLog = (props) => {
         }
         return (<Grid key={"user_action_log_" + r.ACTION_LOG_ID} item xs={12} className={"drac-text-left"}>
           {dayString}
-          <Box px={"xs"}>{
+          <Box px={"xs"}>
+            <span className={"log_user"}>{user.USER_ID === "master"? `${IDToPlayer(r.USER_ID).USER_ORDER + 1}.${IDToPlayer(r.USER_ID).USER_NAME}：`: ""}</span>
+            {
             TargetSelectFormat((r.ACTION_ID === 11 || r.ACTION_ID === 12) ? args.slice(0, -1) : args, r.ACTION_ID, (r.ACTION_ID === 7) ? args[1] : args[args.length - 1])}</Box>
         </Grid>)
       }

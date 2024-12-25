@@ -53,14 +53,15 @@ export default function Master() {
 
   useEffect(() => {
     //陣営会議中は3秒ごとにリロード
-    if(roomInfo.PHASE === 3){
       autoReloadOnTeam.current = setInterval(() => {
-        getActionLog()
+        if(roomInfo.PHASE === 1 || roomInfo.PHASE === 2 || roomInfo.PHASE === 3) {
+          getActionLog()
+        }
       }, 3000);
-    }else if(autoReloadOnTeam.current !== null){
-      clearInterval(autoReloadOnTeam.current);
-      autoReloadOnTeam.current = null;
-    }
+
+      return () => {
+        clearInterval(autoReloadOnTeam.current);
+      }
   }, [roomInfo.PHASE])
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function Master() {
       return;
     }
     api.GetUserList(roomInfo.ROOM_ID).then(res => {
-      setUsers(res.data)
+      setUsers(res.data.users)
     })
   }, [roomInfo]);
 
@@ -233,54 +234,54 @@ export default function Master() {
           </div>)}
         {!user.ROLE &&
           (<Typography fontSize={"x-large"}>{index + 1}：{user.USER_NAME}</Typography>)}
-        <Box className={"drac-d-flex"}>
-          <Box className={"drac-text-left"} p={"xs"}>HP :
-            {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"25px"}
-                                                                    style={{marginTop: "0px", marginLeft: "4px"}}
-                                                                    key={`life_${user.USER_ID}_${lifeIndex}`}
-                                                                    className={(lifeIndex < (user.HP + usersLife.current[index]) ? "life_img" : "life_img_dead") + " pointer"}
-                                                                    onClick={(event) => {
-                                                                      if(lifeIndex < (user.HP + usersLife.current[index] - 1) || lifeIndex > (user.HP + usersLife.current[index])){
-                                                                        return;
-                                                                      }
-                                                                      if (lifeIndex < (user.HP + usersLife.current[index])) {
-                                                                        usersLife.current[index] -= 1;
-                                                                        event.target.style.filter = "grayscale(100%)";
-                                                                      } else {
-                                                                        event.target.style.filter = "grayscale(0)";
-                                                                        usersLife.current[index] += 1;
-                                                                      }
-                                                                      // setRewritten(true);
+        {/*<Box className={"drac-d-flex"}>*/}
+        {/*  <Box className={"drac-text-left"} p={"xs"}>HP :*/}
+        {/*    {Array(DefaultHP).fill(null).map((_, lifeIndex) => <img src={img_life} width={"25px"}*/}
+        {/*                                                            style={{marginTop: "0px", marginLeft: "4px"}}*/}
+        {/*                                                            key={`life_${user.USER_ID}_${lifeIndex}`}*/}
+        {/*                                                            className={(lifeIndex < (user.HP + usersLife.current[index]) ? "life_img" : "life_img_dead") + " pointer"}*/}
+        {/*                                                            onClick={(event) => {*/}
+        {/*                                                              if(lifeIndex < (user.HP + usersLife.current[index] - 1) || lifeIndex > (user.HP + usersLife.current[index])){*/}
+        {/*                                                                return;*/}
+        {/*                                                              }*/}
+        {/*                                                              if (lifeIndex < (user.HP + usersLife.current[index])) {*/}
+        {/*                                                                usersLife.current[index] -= 1;*/}
+        {/*                                                                event.target.style.filter = "grayscale(100%)";*/}
+        {/*                                                              } else {*/}
+        {/*                                                                event.target.style.filter = "grayscale(0)";*/}
+        {/*                                                                usersLife.current[index] += 1;*/}
+        {/*                                                              }*/}
+        {/*                                                              // setRewritten(true);*/}
 
-                                                                      submitRef.current.disabled = false;
-                                                                      console.log(users)
-                                                                    }}/>)}
+        {/*                                                              submitRef.current.disabled = false;*/}
+        {/*                                                              console.log(users)*/}
+        {/*                                                            }}/>)}*/}
 
-            魔力 ： <Typography className={"drac-d-inline"} color={"white"}
-                               fontSize={"x-large"}>{user.MANA}</Typography> +
-            <input
-              id={"mana_input_" + index}
-              ref={(el) => (manaAddInputRefs.current[index] = el)}
-              defaultValue={manaAddInputRefs.current[index]}
-              type="number"
-              style={{
-                fontSize: "x-large",
-                width: '80px',
-                padding: '4px',
-                backgroundColor: 'var(--blackTernary)',
-                color: 'var(--blackSecondary)',
-                borderRadius: '10%'
-              }}
-              onChange={event => {
-                manaAddInputRefs.current[index].value = event.target.value;
-                console.log(+event.target.value)
-                if (+(event.target.value) !== 0) {
-                  submitRef.current.disabled = false;
-                }
-              }}
-            />
-          </Box>
-        </Box>
+        {/*    魔力 ： <Typography className={"drac-d-inline"} color={"white"}*/}
+        {/*                       fontSize={"x-large"}>{user.MANA}</Typography> +*/}
+        {/*    <input*/}
+        {/*      id={"mana_input_" + index}*/}
+        {/*      ref={(el) => (manaAddInputRefs.current[index] = el)}*/}
+        {/*      defaultValue={manaAddInputRefs.current[index]}*/}
+        {/*      type="number"*/}
+        {/*      style={{*/}
+        {/*        fontSize: "x-large",*/}
+        {/*        width: '80px',*/}
+        {/*        padding: '4px',*/}
+        {/*        backgroundColor: 'var(--blackTernary)',*/}
+        {/*        color: 'var(--blackSecondary)',*/}
+        {/*        borderRadius: '10%'*/}
+        {/*      }}*/}
+        {/*      onChange={event => {*/}
+        {/*        manaAddInputRefs.current[index].value = event.target.value;*/}
+        {/*        console.log(+event.target.value)*/}
+        {/*        if (+(event.target.value) !== 0) {*/}
+        {/*          submitRef.current.disabled = false;*/}
+        {/*        }*/}
+        {/*      }}*/}
+        {/*    />*/}
+        {/*  </Box>*/}
+        {/*</Box>*/}
       </Grid>
       <Grid item xs={12}>
         <Box>
@@ -360,7 +361,7 @@ export default function Master() {
     for(let i = 0; i < 8; ++i){
       let playerInfo = OrderToPlayer(i);
       let playerRow = Array(10).fill("");
-      let row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 8);
+      let row = dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 8);
       if(row) {  //絶結使用
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
@@ -376,32 +377,32 @@ export default function Master() {
       }
 
       //護衛：-5
-      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 13)){
+      if(dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 13)){
         playerRow[5] = -5;
       }
-      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 1)){
+      if(dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 1)){
         playerRow[6] = "察";
         playerRow[7] = -1;
       }
-      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 2)){
+      if(dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 2)){
         playerRow[6] = "凝";
         playerRow[7] = -4;
       }
-      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 3)){
+      if(dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 3)){
         playerRow[6] = "忠";
         playerRow[7] = -4;
       }
-      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 4)){
+      if(dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 4)){
         playerRow[6] = "見";
         playerRow[7] = -1;
       }
-      if(dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 11)){
+      if(dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 11)){
         playerRow[8] = "t";
         playerRow[9] = -1;
       }
 
       //裁定
-      row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 5);
+      row = dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 5);
       if(row) {
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
@@ -477,7 +478,7 @@ export default function Master() {
       let playerInfo = OrderToPlayer(i);
       let playerRow = Array(2).fill("");
       //戦闘力
-      let row = dailyLog.find(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 7);
+      let row = dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 7);
       if(row) {
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), targets[1]];
@@ -490,7 +491,7 @@ export default function Master() {
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
           onClick={() => navigator.clipboard.writeText(outputLog)}
-          style={{cursor: 'pointer'}}>(AS{3 + day * 11 - 11}~AT{10 + day * 11 - 11})
+          style={{cursor: 'pointer'}}>(AT{3 + day * 11 - 11}~AU{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
                   className={"CopyTextArea"}
@@ -508,14 +509,14 @@ export default function Master() {
         <Button onClick={toggleTeamOrder}>
           並び替え
         </Button>
-        <Button
-          ref={submitRef}
-          onClick={() => {
-            updateUserInfo();
-          }}>HPと魔力を更新</Button>
+        {/*<Button*/}
+        {/*  ref={submitRef}*/}
+        {/*  onClick={() => {*/}
+        {/*    updateUserInfo();*/}
+        {/*  }}>HPと魔力を更新</Button>*/}
         <Button onClick={getActionLog}>ログ再取得</Button>
         {users.length > 0 ?
-          <Button onClick={OnNextPhase} mx={"auto"}>
+          <Button onClick={OnNextPhase} mx={"auto"} color={"red"}>
             {roomInfo.DAY > 0 ? <>進める</> : <>開始</>}
           </Button> : ''}
       </Box>
@@ -531,9 +532,10 @@ export default function Master() {
         {users.length > 0 && users[0].ROLE === null &&
           (<>
             <Button style={{
-              margin: "30px auto"}} m={"lg"} onClick={() => api.SetRoleAutomated(roomInfo.ROOM_ID).then(() => {
+              margin: "30px auto"
+            }} m={"lg"} onClick={() => api.SetRoleAutomated(roomInfo.ROOM_ID).then(() => {
               api.GetUserList(roomInfo.ROOM_ID).then(res => {
-                setUsers(res.data)
+                setUsers(res.data.users)
               })
             })}>ロールの自動割り当て</Button>
           </>)}
@@ -566,17 +568,23 @@ export default function Master() {
             </Button>
           </form>}</Box>
 
+      <h2 style={{padding: "15px"}}>タイムライン</h2>
+      <Box className={"SquareFull ScrollBox"}>
+        <PlayerLog player={{USER_ID: "master"}} log={actionLog} users={users}/>
+      </Box>
+
+      <h2 style={{padding: "15px"}}>コピー用ログ</h2>
       {Array(roomInfo.DAY).fill(null).map(
         (_, index) => {
           return (
-          <>
-            <h2>{index + 1}日目</h2>
-            <Box className={"drac-d-inline-flex"}>
-            <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
-            <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
-            <LogTextArea4 key={"logArea4_" + (index + 1)} logList={actionLog} day={index + 1}/>
-          </Box>
-          </>)
+            <>
+              <h2>{index + 1}日目</h2>
+              <Box className={"drac-d-inline-flex"}>
+                <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
+                <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
+                <LogTextArea4 key={"logArea4_" + (index + 1)} logList={actionLog} day={index + 1}/>
+              </Box>
+            </>)
         }
       )}
       {/*<div>*/}

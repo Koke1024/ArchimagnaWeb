@@ -63,7 +63,6 @@ input{
   width: 50%;
 }
 
-
 .SquareFull{
   background: var(--blackTernary);
   border: .3rem solid transparent;
@@ -73,6 +72,11 @@ input{
   transition: all .3s ease-in-out;
   padding: 0;
   color: var(--blackSecondary);
+}
+
+.ScrollBox{
+  height: 300px;
+  overflow-y: scroll;
 }
 
 .Players{
@@ -89,6 +93,9 @@ input{
   transition: all .3s ease-in-out;
   padding: 5px;
   color: var(--blackSecondary);
+
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 .Controller{
@@ -214,4 +221,9 @@ input{
   margin: 0 30px;
   background-color: var(--blackTernary);
   color: var(--blackSecondary);
+}
+
+span.log_user{
+  color: var(--blackSecondary);
+  font-weight: 800;
 }

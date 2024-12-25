@@ -13,6 +13,7 @@ import ConfirmDialog from './component/Dialog';
 function Player() {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
+  const [teams, setTeams] = useState([]);
   const [myInfo, setMyInfo] = useState({})
   const {room, userId, token} = useParams();
   const navigate = useNavigate();
@@ -86,17 +87,19 @@ function Player() {
     if(Object.keys(myInfo).length > 0) {
       return;
     }
-    api.GetUserNames(userId, token).then(() => {
+    // api.GetUserNames(userId, token).then(() => {
       api.GetUserInfo(userId, token).then(r => setMyInfo(r.data))
-    })
+    // })
   }, [token, userId])
 
   useEffect(() => {
     if (!roomInfo?.ROOM_ID || users.length !== 0) {
       return;
     }
-    api.GetUserNames(roomInfo.ROOM_ID).then(res => {
-      setUsers(res.data)
+    api.GetUserNames(roomInfo.ROOM_ID, myInfo.TOKEN).then(res => {
+      setUsers(res.data.users)
+      setTeams(res.data.teams)
+      console.log(res.data)
     })
   }, [roomInfo]);
 
@@ -344,9 +347,9 @@ function Player() {
                     onConfirm={() => {
                       handleConfirm(() => {
                         if (inputAction === 7) {
-                          if(actionValue.length === 0 || parseInt(actionValue) < 1){
+                          if(actionValue.length === 0 || parseInt(actionValue) < 0){
                             setShowWarning(true);
-                            warningParameter.current = {title: "", message: "攻撃には1以上の魔力の消費が必要です。"}
+                            warningParameter.current = {title: "", message: "攻撃には0以上の魔力の消費が必要です。"}
                             return;
                           }
                           selectedTargets.current[1] = actionValue;
@@ -373,6 +376,14 @@ function Player() {
                             console.log("絶結使用済み");
                             setShowWarning(true);
                             warningParameter.current = {title: "", message: "絶結はゲーム中一度しか行えません。"}
+                            return;
+                          }
+                        }
+                        if(inputAction === 5){
+                          console.log([selectedTargets.current[0], myInfo.USER_NAME, teams])
+                          if(selectedTargets.current[0] === myInfo.USER_NAME || teams.find(r => r.USER_NAME === selectedTargets.current[0])){
+                            setShowWarning(true);
+                            warningParameter.current = {title: "", message: "裁定の勝者に自身とツインは指定できません。"}
                             return;
                           }
                         }
