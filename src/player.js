@@ -417,8 +417,6 @@ function Player() {
         message={warningParameter.current.message}
         simple={true}
       />
-      {/*<Header/>*/}
-
     </Box>
   );
 }

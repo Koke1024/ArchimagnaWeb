@@ -11,7 +11,7 @@ import PhaseDisplay, {PlayerLog} from "./component/PhaseDisplay";
 import {RoomContext, UsersContext} from "./App";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-export default function Master() {
+export default function Master(props) {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
   const [actionLog, setActionLog] = useState([]);
@@ -25,6 +25,8 @@ export default function Master() {
   const navigate = useNavigate();
   const [upd, setUpd] = useState(0);
   const submitRef = useRef(null);
+
+  const isWatcher = props.watcher;
 
   function CopyText(text) {
     navigator.clipboard.writeText(text)
@@ -154,9 +156,10 @@ export default function Master() {
 
   function Header() {
     const fullPath = `${window.location.origin}${location.pathname}${location.search}${location.hash}`;
+    const watcherFullPath = fullPath.replace("/gm/", "/watch/");
 
-    function CopyUrl() {
-      navigator.clipboard.writeText(fullPath)
+    function CopyUrl(path) {
+      navigator.clipboard.writeText(path)
         .then(() => {
           console.log("Copied")
         })
@@ -166,15 +169,21 @@ export default function Master() {
     }
 
     return <header className="App-header">
-      <h1 style={{paddingTop: "30px"}}>ArchiMagna GM</h1>
-      {token ?
-        <>
+      {isWatcher ?
+        <h1 style={{paddingTop: "30px"}}>ArchiMagna</h1>:
+      <h1 style={{paddingTop: "30px"}}>ArchiMagna GM</h1>}
+      {token && !isWatcher ?
+          <>
           <div style={{margin: "10px"}}>GM用URL</div>
-          <Box onClick={CopyUrl} className={"drac-d-flex"} style={{margin: "auto", width: "50%", cursor: 'pointer'}}>
+          <Box onClick={() => CopyUrl(fullPath)} className={"drac-d-flex"} style={{margin: "auto", width: "50%", cursor: 'pointer'}}>
             <input id={"gm_url"} readOnly={true} type={"text"} style={{cursor: 'pointer'}} value={fullPath}></input>
             <ContentCopyIcon color={"gray"} style={{marginLeft: "-40px", marginTop: "8px"}}/>
           </Box>
-          <div style={{margin: "10px"}}>URLを紛失しないようにしてください。</div>
+        <div style={{margin: "10px"}}>観戦用URL</div>
+        <Box onClick={() => CopyUrl(watcherFullPath)} className={"drac-d-flex"} style={{margin: "auto", width: "50%", cursor: 'pointer'}}>
+            <input id={"gm_url"} readOnly={true} type={"text"} style={{cursor: 'pointer'}} value={watcherFullPath}></input>
+            <ContentCopyIcon color={"gray"} style={{marginLeft: "-40px", marginTop: "8px"}}/>
+          </Box>
         </> : ''}
     </header>
   }
@@ -515,7 +524,7 @@ export default function Master() {
         {/*    updateUserInfo();*/}
         {/*  }}>HPと魔力を更新</Button>*/}
         <Button onClick={getActionLog}>ログ再取得</Button>
-        {users.length > 0 ?
+        {users.length > 0 && !isWatcher ?
           <Button onClick={OnNextPhase} mx={"auto"} color={"red"}>
             {roomInfo.DAY > 0 ? <>進める</> : <>開始</>}
           </Button> : ''}
@@ -529,7 +538,7 @@ export default function Master() {
         // resize: "both",
         margin: "30px auto"
       }}>
-        {users.length > 0 && users[0].ROLE === null &&
+        {users.length > 0 && users[0].ROLE === null && !isWatcher &&
           (<>
             <Button style={{
               margin: "30px auto"
@@ -553,7 +562,7 @@ export default function Master() {
               ))}
             </Grid>
           ) :
-          <form style={{width: "100%", margin: "auto"}}>
+          (isWatcher? "": <form style={{width: "100%", margin: "auto"}}>
             <>プレイヤーの名前を入力</>
             <InputPlayerNames/>
             <Button m={"xs"} onClick={(event) => {
@@ -566,7 +575,7 @@ export default function Master() {
               RegisterUsers();
             }}>プレイヤー名登録
             </Button>
-          </form>}</Box>
+          </form>)}</Box>
 
       <h2 style={{padding: "15px"}}>タイムライン</h2>
       <Box className={"SquareFull ScrollBox"}>

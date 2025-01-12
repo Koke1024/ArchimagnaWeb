@@ -23,6 +23,7 @@ function App() {
           <Route path="/pl/:room/:userId/:token" element={<Player/>}/>
           <Route path="/gm" element={<Master/>}/>
           <Route path="/gm/:token" element={<Master/>}/>
+          <Route path="/watch/:token" element={<Master watcher={true}/>}/>
         </Routes>
       </BrowserRouter>
       </RoomContext.Provider>
