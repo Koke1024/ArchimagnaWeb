@@ -411,13 +411,43 @@ export default function Master(props) {
         playerRow[9] = -1;
       }
 
+      outputLog += `${playerRow.join("\t")}\r\n`;
+    }
+    return (
+      <Box className={"flex"} style={{flexDirection: "column"}}>
+        <h3
+          onClick={() => navigator.clipboard.writeText(outputLog)}
+          style={{cursor: 'pointer'}}>(Q{3 + day * 11 - 11}~Z{10 + day * 11 - 11})
+          <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
+        <textarea readOnly={true}
+                  className={"CopyTextArea"}
+                  value={outputLog}>
+        </textarea>
+      </Box>
+    )
+  }
+
+  function LogTextArea2({logList, day}) {
+    if(users.length === 0){
+      return <></>;
+    }
+
+    let outputLog = "";
+    let dailyLog = logList.filter(v => v.DAY === day);
+
+    //8人ID順に
+    for(let i = 0; i < 8; ++i){
+      let playerInfo = OrderToPlayer(i);
+      let playerRow = Array(2).fill("");
+      let row = dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 8);
+
       //裁定
       row = dailyLog.findLast(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 5);
       if(row) {
         let targets = JSON.parse(row.ACTION_TARGET);
         let target = [NameToPlayer(targets[0]), NameToPlayer(targets[1])];
-        playerRow[10] = target[0].USER_ORDER + 1;
-        playerRow[11] = target[1].USER_ORDER + 1;
+        playerRow[0] = target[0].USER_ORDER + 1;
+        playerRow[1] = target[1].USER_ORDER + 1;
       }
 
       outputLog += `${playerRow.join("\t")}\r\n`;
@@ -426,7 +456,7 @@ export default function Master(props) {
       <Box className={"flex"} style={{flexDirection: "column"}}>
         <h3
           onClick={() => navigator.clipboard.writeText(outputLog)}
-          style={{cursor: 'pointer'}}>(Q{3 + day * 11 - 11}~AB{10 + day * 11 - 11})
+          style={{cursor: 'pointer'}}>(AA{3 + day * 11 - 11}~AB{10 + day * 11 - 11})
           <ContentCopyIcon color={"gray"} style={{marginLeft: "20px", marginTop: "8px"}}/></h3>
         <textarea readOnly={true}
                   className={"CopyTextArea"}
@@ -592,6 +622,7 @@ export default function Master(props) {
               <h2>{index + 1}日目</h2>
               <Box className={"drac-d-inline-flex"}>
                 <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
+                <LogTextArea2 key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
                 <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
                 <LogTextArea4 key={"logArea4_" + (index + 1)} logList={actionLog} day={index + 1}/>
               </Box>
