@@ -231,10 +231,10 @@ export default function Master(props) {
                             className={"text-outline drac-d-inline"}>
                   {user.USER_ORDER + 1}［{RoleInfo[user.ROLE]}］{user.USER_NAME}
                 </Typography>
-                <div className={"pointer"} color="gray" title={"プレイヤー用URLをクリップボードにコピー"}
+                {!isWatcher && <div className={"pointer"} color="gray" title={"プレイヤー用URLをクリップボードにコピー"}
                      onClick={() => CopyText(`${user.USER_NAME}：` + playerFullUrl(user.USER_ID, user.TOKEN))}>
                   <ContentCopyIcon color={"gray"} fontSize={"xs"} style={{marginTop: "8px", marginLeft: "10px"}}/>
-                </div>
+                </div>}
               </Paper>
               <Box color={"black"}>
                 <span>{TeamInfo[user.TEAM].Name}ツイン・{user.ROLE <= 4? "主": "従"}</span>

@@ -51,7 +51,6 @@ export const PlayerLog = (props) => {
     return (<Box key={"user_action_log_box_" + user.USER_ID} className={"Log"}>NO LOG</Box>);
   }
   let day = -1;
-  log.reverse();
 
   return (<Box key={"user_action_log_box_" + user.USER_ID} className={"Log"}
   >
