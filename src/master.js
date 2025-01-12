@@ -131,6 +131,7 @@ export default function Master(props) {
                   id={"name_input_text_" + index}
                   ref={(el) => (nameInputRefs.current[index] = el)}
                   placeholder={`Player ${index + 1}`}
+                  defaultValue={`PC${index + 1} `}
                   type="text"
                   style={{width: '400px', margin: '10px auto'}}
                   required
@@ -582,7 +583,8 @@ export default function Master(props) {
         <PlayerLog player={{USER_ID: "master"}} log={actionLog} users={users}/>
       </Box>
 
-      <h2 style={{padding: "15px"}}>コピー用ログ</h2>
+      {isWatcher? "":
+      <><h2 style={{padding: "15px"}}>コピー用ログ</h2>
       {Array(roomInfo.DAY).fill(null).map(
         (_, index) => {
           return (
@@ -595,7 +597,8 @@ export default function Master(props) {
               </Box>
             </>)
         }
-      )}
+      )}</>
+      }
       {/*<div>*/}
       {/*  <Button m={"lg"} onClick={api.TruncateAll}>TruncateAll</Button>*/}
       {/*</div>*/}
