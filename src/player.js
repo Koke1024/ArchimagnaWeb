@@ -370,8 +370,6 @@ function Player() {
                             warningParameter.current = {title: "", message: "「（PC名）の精霊は（精霊名）である」の形式で入力してください。"}
                             return;
                           }
-
-
                           if(selectedTargets.current[0] === myInfo.USER_NAME || teams.find(r => r.USER_NAME === selectedTargets.current[0])){
                             setShowWarning(true);
                             warningParameter.current = {title: "", message: "呼剥の対象に自身とツインは指定できません。"}
