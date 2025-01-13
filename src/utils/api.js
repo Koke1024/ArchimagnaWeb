@@ -39,7 +39,6 @@ class ApiClass{
       TOKEN: userToken,
       MASTER: 0
     }
-    console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});
   }
 

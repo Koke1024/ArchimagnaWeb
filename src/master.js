@@ -15,6 +15,7 @@ export default function Master(props) {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
   const [actionLog, setActionLog] = useState([]);
+  const [inited, setInited] = useState(false);
   const usersLife = useRef(Array(8).fill(0));
   const nameInputRefs = useRef([]);
   const manaAddInputRefs = useRef([]);
@@ -66,12 +67,27 @@ export default function Master(props) {
       }
   }, [roomInfo.PHASE])
 
+
   useEffect(() => {
     if (token) {
       api.GetRoomInfo(token).then(r => {
-        console.log(r)
         if (Object.keys(r.data).length !== 0) {
-          console.log(r.data)
+          setRoomInfo(r.data);
+          api.GetActionLog(r.data.ROOM_ID).then(res => {
+            setActionLog(res.data);
+          })
+        } else {
+          console.error("対応する部屋が存在しない")
+          navigate('/');
+        }
+      })
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      api.GetRoomInfo(token).then(r => {
+        if (Object.keys(r.data).length !== 0) {
           setRoomInfo(r.data);
         } else {
           console.error("対応する部屋が存在しない")
@@ -148,7 +164,6 @@ export default function Master(props) {
       <Header/>
         <Button
           m={"lg"} onClick={() => api.CreateRoom().then(r => {
-          console.log(r)
           navigate("/gm/" + r.data.TOKEN);
         })}>新規ルームの作成
         </Button>
@@ -195,12 +210,6 @@ export default function Master(props) {
 
   const playerUrl = (user_id, token) => {
     return `/pl/${roomInfo.ROOM_ID}/${user_id}/${token}`;
-  }
-
-  const openPlayerPage = (user_id, token) => {
-    let link = playerUrl(user_id, token);
-    console.log(link)
-    navigate(link);
   }
 
   function RegisterUsers() {
@@ -295,7 +304,7 @@ export default function Master(props) {
       </Grid>
       <Grid item xs={12}>
         <Box>
-          <PlayerLog player={users[index]} log={actionLog.filter(v => v.USER_ID === user.USER_ID)}/>
+          <PlayerLog player={users[index]} log={actionLog.filter(v => v.USER_ID === user.USER_ID)} users={users} />
         </Box>
       </Grid>
     </Grid>
@@ -304,8 +313,8 @@ export default function Master(props) {
   const OnNextPhase = () => {
     api.NextPhase(roomInfo.ROOM_ID).then(r => {
       if (Object.keys(r.data).length > 0) {
-        console.log(r.data)
         setRoomInfo(r.data);
+        getActionLog();
       } else {
         console.error("対応する部屋が存在しない")
         navigate('/');
@@ -569,16 +578,6 @@ export default function Master(props) {
         // resize: "both",
         margin: "30px auto"
       }}>
-        {users.length > 0 && users[0].ROLE === null && !isWatcher &&
-          (<>
-            <Button style={{
-              margin: "30px auto"
-            }} m={"lg"} onClick={() => api.SetRoleAutomated(roomInfo.ROOM_ID).then(() => {
-              api.GetUserList(roomInfo.ROOM_ID).then(res => {
-                setUsers(res.data.users)
-              })
-            })}>ロールの自動割り当て</Button>
-          </>)}
         {users.length > 0 && roomInfo.DAY === 0 && !isWatcher &&
           (<>
             <Button style={{
@@ -628,15 +627,15 @@ export default function Master(props) {
       {Array(roomInfo.DAY).fill(null).map(
         (_, index) => {
           return (
-            <>
+            <div key={"logArea_" + (index + 1)}>
               <h2>{index + 1}日目</h2>
               <Box className={"drac-d-inline-flex"}>
-                <LogTextArea key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
-                <LogTextArea2 key={"logArea_" + (index + 1)} logList={actionLog} day={index + 1}/>
+                <LogTextArea key={"logArea1_" + (index + 1)} logList={actionLog} day={index + 1}/>
+                <LogTextArea2 key={"logArea2_" + (index + 1)} logList={actionLog} day={index + 1}/>
                 <LogTextArea3 key={"logArea3_" + (index + 1)} logList={actionLog} day={index + 1}/>
                 <LogTextArea4 key={"logArea4_" + (index + 1)} logList={actionLog} day={index + 1}/>
               </Box>
-            </>)
+            </div>)
         }
       )}</>
       }

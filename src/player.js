@@ -11,18 +11,18 @@ import {CustomInput, CustomListItemText, CustomMenu, CustomMenuItem} from "./com
 import ConfirmDialog from './component/Dialog';
 
 function Player() {
+  const {room, userId, token} = useParams();
+
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
   const [teams, setTeams] = useState([]);
   const [myInfo, setMyInfo] = useState({})
-  const {room, userId, token} = useParams();
   const navigate = useNavigate();
   const [upd, setUpd] = useState(0);
   const [actionLog, setActionLog] = useState([]);
   const [actionValue, setActionValue] = useState('');
   const [inputAction, setInputAction] = useState(0);
   const selectedTargets = useRef([]);
-  const location = useLocation();
   const [openDialog, setOpenDialog] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
   const warningParameter = useRef({});
@@ -43,15 +43,15 @@ function Player() {
 
   const getActionLog = () => {
     if (!roomInfo.ROOM_ID) {
-      return;
+      return false;
     }
     if (!myInfo.USER_ID) {
-      return;
+      return false;
     }
     api.GetUserActionLog(roomInfo.ROOM_ID, myInfo.USER_ID).then(res => {
-      console.log(res.data)
       setActionLog(res.data);
     })
+    return true;
   }
 
   const updateConfirmButtonText = () => {
@@ -65,12 +65,14 @@ function Player() {
     updateConfirmButtonText()
   }, [inputAction, actionValue, selectedTargets.current]);
 
-  useEffect(() => {
+  const LoadRoomInfo = () => {
     if (token) {
       api.GetRoomInfoFromUser(userId, token).then(r => {
-        console.dir(r.data)
         if (Object.keys(r.data).length > 0) {
           setRoomInfo(r.data);
+          if (myInfo.USER_ID) {
+            getActionLog();
+          }
         } else {
           console.error("対応する部屋が存在しない")
           navigate('/');
@@ -78,6 +80,26 @@ function Player() {
         getActionLog();
       })
     }
+  }
+
+  useEffect(() => {
+    if (token) {
+      api.GetUserActionLog(room, userId).then(res => {
+        setActionLog(res.data);
+        api.GetUserInfo(userId, token).then(u => {
+          setMyInfo(u.data)
+          api.GetRoomInfoFromUser(userId, token).then(r => {
+            if (Object.keys(r.data).length > 0) {
+              setRoomInfo(r.data);
+            }
+          })
+        })
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    LoadRoomInfo()
   }, [token, upd]);
 
   useEffect(() => {
@@ -88,18 +110,23 @@ function Player() {
       return;
     }
     // api.GetUserNames(userId, token).then(() => {
-      api.GetUserInfo(userId, token).then(r => setMyInfo(r.data))
+      api.GetUserInfo(userId, token).then(r => {
+        setMyInfo(r.data)
+        if (roomInfo.ROOM_ID) {
+          console.log(roomInfo)
+          getActionLog()
+        }
+      })
     // })
   }, [token, userId])
 
   useEffect(() => {
-    if (!roomInfo?.ROOM_ID || users.length !== 0) {
+    if (!roomInfo?.ROOM_ID || users.length !== 0 || !myInfo.TOKEN) {
       return;
     }
     api.GetUserNames(roomInfo.ROOM_ID, myInfo.TOKEN).then(res => {
       setUsers(res.data.users)
       setTeams(res.data.teams)
-      console.log(res.data)
     })
   }, [roomInfo]);
 
@@ -410,7 +437,7 @@ function Player() {
         }
         <Grid item xs={12}>
           <Box className={"SquareFull"}>
-            <PlayerLog player={myInfo} log={actionLog}/>
+            <PlayerLog player={myInfo} log={actionLog} users={users}/>
           </Box>
         </Grid>
       </Grid>
