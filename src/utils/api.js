@@ -29,7 +29,6 @@ class ApiClass{
       ROOM_ID: roomId,
       MASTER: 1
     }
-    console.log(param)
     return axios.get(baseURL + '/user/list', {params: param});
   }
 
@@ -68,7 +67,6 @@ class ApiClass{
     let param = {
       TOKEN: roomToken,
     }
-    console.log(param)
     return axios.get(baseURL + '/room/info', {params: param});
   }
   GetRoomInfoFromUser(userId, userToken){
@@ -100,7 +98,6 @@ class ApiClass{
       DAY: day,
       ROOM_ID: roomId,
     }
-    console.log(param)
     return axios.post(baseURL + '/game/action', param);
   }
 
