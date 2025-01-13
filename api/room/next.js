@@ -31,6 +31,39 @@ export default async function handler(req, res) {
         `)
       });
 
+    // ACTION_IDが5,6,7の場合、最新を残して削除
+    await knex.raw(`
+        DELETE
+        FROM ACTION_TBL
+        WHERE ACTION_LOG_ID NOT IN (SELECT *
+          FROM (SELECT MAX(ACTION_LOG_ID)
+                FROM ACTION_TBL
+                WHERE ROOM_ID = ?
+                  AND ACTION_ID IN (5, 7, 8)
+                GROUP BY ROOM_ID, USER_ID, DAY, ACTION_ID) AS latest)
+          AND ROOM_ID = ?
+          AND ACTION_ID IN (5, 7, 8);
+      `, [ROOM_ID, ROOM_ID]);
+
+    // ACTION_IDが6の場合、最新3つを残して削除
+    await knex.raw(`
+        DELETE
+        FROM ACTION_TBL
+        WHERE ACTION_LOG_ID NOT IN (SELECT *
+            FROM (SELECT ACTION_LOG_ID
+                  FROM (SELECT ACTION_LOG_ID,
+                               ROW_NUMBER() OVER (
+           PARTITION BY ROOM_ID, USER_ID, DAY, ACTION_ID 
+           ORDER BY UPD_DATE DESC
+         ) AS rn
+                  FROM ACTION_TBL
+                  WHERE ROOM_ID = ?
+                    AND ACTION_ID = 6) ranked
+            WHERE rn <= 3) AS latest)
+          AND ROOM_ID = ?
+          AND ACTION_ID = 6;
+      `, [ROOM_ID, ROOM_ID]);
+
     // 更新後のデータを取得して返す
     const updatedRoom = await knex('ROOM_TBL')
       .select('*')
