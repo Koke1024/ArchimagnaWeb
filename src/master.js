@@ -478,8 +478,8 @@ export default function Master(props) {
       let playerInfo = OrderToPlayer(i);
       let playerRow = Array(10).fill("");
       //こはく
-      let rows = dailyLog.filter(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 6);
-      Object.entries(rows).forEach(([index, row]) => {
+      let rows = dailyLog.filter(r => r.USER_ID === playerInfo.USER_ID && r.ACTION_ID === 6).slice(-3);
+       Object.entries(rows).forEach(([index, row]) => {
           let targets = JSON.parse(row.ACTION_TARGET);
           let target = [NameToPlayer(targets[0]), targets[1]];
           playerRow[0 + index * 3] = target[0].USER_ORDER + 1;
@@ -570,6 +570,16 @@ export default function Master(props) {
         margin: "30px auto"
       }}>
         {users.length > 0 && users[0].ROLE === null && !isWatcher &&
+          (<>
+            <Button style={{
+              margin: "30px auto"
+            }} m={"lg"} onClick={() => api.SetRoleAutomated(roomInfo.ROOM_ID).then(() => {
+              api.GetUserList(roomInfo.ROOM_ID).then(res => {
+                setUsers(res.data.users)
+              })
+            })}>ロールの自動割り当て</Button>
+          </>)}
+        {users.length > 0 && roomInfo.DAY === 0 && !isWatcher &&
           (<>
             <Button style={{
               margin: "30px auto"
