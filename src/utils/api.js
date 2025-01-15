@@ -86,6 +86,15 @@ class ApiClass{
   NextPhase(roomId){
     let param = {
       ROOM_ID: roomId,
+      BACK: false,
+    }
+    return axios.post(baseURL + '/room/next', param);
+  }
+
+  BackPhase(roomId){
+    let param = {
+      ROOM_ID: roomId,
+      BACK: true,
     }
     return axios.post(baseURL + '/room/next', param);
   }

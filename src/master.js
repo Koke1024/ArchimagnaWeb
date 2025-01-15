@@ -15,10 +15,9 @@ export default function Master(props) {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
   const [actionLog, setActionLog] = useState([]);
-  const [inited, setInited] = useState(false);
-  const usersLife = useRef(Array(8).fill(0));
+  // const usersLife = useRef(Array(8).fill(0));
   const nameInputRefs = useRef([]);
-  const manaAddInputRefs = useRef([]);
+  // const manaAddInputRefs = useRef([]);
   const autoReloadOnTeam = useRef(null);
   const [isTeamOrder, setTeamOrder] = useState(false);
   const {token} = useParams();
@@ -115,25 +114,25 @@ export default function Master(props) {
     })
   }
 
-  const updateUserInfo = () => {
-    if (!roomInfo.ROOM_ID) {
-      return;
-    }
-    let _users = users;
-    for (let i = 0; i < _users.length; ++i) {
-      console.log(manaAddInputRefs.current[i].value)
-      _users[i].MANA = +(manaAddInputRefs.current[i].value) ?? 0;
-    }
-    for (let i = 0; i < _users.length; ++i) {
-      _users[i].HP = usersLife.current[i] ?? 0;
-    }
-    api.UpdateUserInfo(roomInfo.ROOM_ID, _users).then(res => {
-      usersLife.current = (Array(8).fill(0));
-      setUsers(res.data)
-      getActionLog();
-      submitRef.current.disabled = true;
-    })
-  }
+  // const updateUserInfo = () => {
+  //   if (!roomInfo.ROOM_ID) {
+  //     return;
+  //   }
+  //   let _users = users;
+  //   for (let i = 0; i < _users.length; ++i) {
+  //     console.log(manaAddInputRefs.current[i].value)
+  //     _users[i].MANA = +(manaAddInputRefs.current[i].value) ?? 0;
+  //   }
+  //   for (let i = 0; i < _users.length; ++i) {
+  //     _users[i].HP = usersLife.current[i] ?? 0;
+  //   }
+  //   api.UpdateUserInfo(roomInfo.ROOM_ID, _users).then(res => {
+  //     usersLife.current = (Array(8).fill(0));
+  //     setUsers(res.data)
+  //     getActionLog();
+  //     submitRef.current.disabled = true;
+  //   })
+  // }
 
   function InputPlayerNames() {
     return (
@@ -312,6 +311,18 @@ export default function Master(props) {
 
   const OnNextPhase = () => {
     api.NextPhase(roomInfo.ROOM_ID).then(r => {
+      if (Object.keys(r.data).length > 0) {
+        setRoomInfo(r.data);
+        getActionLog();
+      } else {
+        console.error("対応する部屋が存在しない")
+        navigate('/');
+      }
+    })
+  }
+
+  const OnNBackPhase = () => {
+    api.BackPhase(roomInfo.ROOM_ID).then(r => {
       if (Object.keys(r.data).length > 0) {
         setRoomInfo(r.data);
         getActionLog();
@@ -564,6 +575,9 @@ export default function Master(props) {
         {/*    updateUserInfo();*/}
         {/*  }}>HPと魔力を更新</Button>*/}
         <Button onClick={getActionLog}>ログ再取得</Button>
+        <Button onClick={OnNBackPhase} mx={"auto"} color={"orange"}>
+          <>戻す</>
+        </Button>
         {users.length > 0 && !isWatcher ?
           <Button onClick={OnNextPhase} mx={"auto"} color={"red"}>
             {roomInfo.DAY > 0 ? <>進める</> : <>開始</>}
