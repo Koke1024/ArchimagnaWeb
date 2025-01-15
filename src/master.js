@@ -14,6 +14,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 export default function Master(props) {
   const {users, setUsers} = useContext(UsersContext);
   const {roomInfo, setRoomInfo} = useContext(RoomContext);
+  const [loading, setLoading] = useState(0);
   const [actionLog, setActionLog] = useState([]);
   // const usersLife = useRef(Array(8).fill(0));
   const nameInputRefs = useRef([]);
@@ -69,11 +70,15 @@ export default function Master(props) {
 
   useEffect(() => {
     if (token) {
+      setLoading(v => v + 1)
       api.GetRoomInfo(token).then(r => {
+        setLoading(v => v - 1)
         if (Object.keys(r.data).length !== 0) {
           setRoomInfo(r.data);
+          setLoading(v => v + 1)
           api.GetActionLog(r.data.ROOM_ID).then(res => {
             setActionLog(res.data);
+            setLoading(v => v - 1)
           })
         } else {
           console.error("対応する部屋が存在しない")
@@ -85,7 +90,9 @@ export default function Master(props) {
 
   useEffect(() => {
     if (token) {
+      setLoading(v => v + 1)
       api.GetRoomInfo(token).then(r => {
+        setLoading(v => v - 1)
         if (Object.keys(r.data).length !== 0) {
           setRoomInfo(r.data);
         } else {
@@ -100,7 +107,9 @@ export default function Master(props) {
     if (!roomInfo?.ROOM_ID) {
       return;
     }
+    setLoading(v => v + 1)
     api.GetUserList(roomInfo.ROOM_ID).then(res => {
+      setLoading(v => v - 1)
       setUsers(res.data.users)
     })
   }, [roomInfo]);
@@ -109,7 +118,9 @@ export default function Master(props) {
     if (!roomInfo.ROOM_ID) {
       return;
     }
+    setLoading(v => v + 1)
     api.GetActionLog(roomInfo.ROOM_ID).then(res => {
+      setLoading(v => v - 1)
       setActionLog(res.data);
     })
   }
@@ -575,9 +586,13 @@ export default function Master(props) {
         {/*    updateUserInfo();*/}
         {/*  }}>HPと魔力を更新</Button>*/}
         <Button onClick={getActionLog}>ログ再取得</Button>
-        <Button onClick={OnNBackPhase} mx={"auto"} color={"orange"}>
+        {!isWatcher ?
+        <Button onClick={OnNBackPhase} mx={"auto"} color={"orange"}
+        disabled={roomInfo.DAY === 0 || (roomInfo.DAY === 1 && roomInfo.PHASE === 1)}
+        >
           <>戻す</>
         </Button>
+          : ''}
         {users.length > 0 && !isWatcher ?
           <Button onClick={OnNextPhase} mx={"auto"} color={"red"}>
             {roomInfo.DAY > 0 ? <>進める</> : <>開始</>}
@@ -629,7 +644,8 @@ export default function Master(props) {
               RegisterUsers();
             }}>プレイヤー名登録
             </Button>
-          </form>)}</Box>
+          </form>)}
+        </Box>
 
       <h2 style={{padding: "15px"}}>タイムライン</h2>
       <Box className={"SquareFull ScrollBox"}>
