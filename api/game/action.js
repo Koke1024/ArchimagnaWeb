@@ -1,4 +1,5 @@
-const knex = require('../../knexfile.js'); // knex設定のインポート
+// api/game/action.js
+const { addAction } = require('../_lib/actions.js');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -7,21 +8,12 @@ export default async function handler(req, res) {
 
   const { USER_ID, ACTION_ID, TARGET, DAY, ROOM_ID } = req.body;
 
-  // 必須パラメータの確認
   if (!USER_ID || !ACTION_ID || !TARGET || !DAY || !ROOM_ID) {
     return res.status(400).json({ error: 'Missing required parameters' });
   }
 
   try {
-    // `ACTION_TBL`にデータを挿入
-    await knex('ACTION_TBL').insert({
-      ACTION_ID,
-      USER_ID,
-      ACTION_TARGET: TARGET,
-      DAY,
-      ROOM_ID
-    });
-
+    await addAction(ROOM_ID, { ACTION_ID, USER_ID, ACTION_TARGET: TARGET, DAY });
     res.json({ success: true });
   } catch (error) {
     console.error(error.message);

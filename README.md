@@ -54,3 +54,81 @@ GMから送られるURLにアクセスします。
 
 なお、ブラウザのページ翻訳が有効になっている場合、
 無効にして利用してください。
+
+
+# 開発者向け: バックエンド構成
+
+本ツールのバックエンド（`api/`配下のVercel Serverless Functions）は、
+MySQL(RDS)からAWS DynamoDBへ移行済みです。DynamoDBはオンデマンド課金
+(PAY_PER_REQUEST)のため、本ツールのような低頻度・セッション単位の
+利用パターンでは、常時起動が必要なRDSに比べて運用コストを大幅に
+抑えられます。
+
+## 必要な環境変数
+
+Vercelのプロジェクト設定（Environment Variables）に以下を追加してください。
+AWSはIAMロールではなくアクセスキーで認証するため、`AWS_ACCESS_KEY_ID` /
+`AWS_SECRET_ACCESS_KEY` の設定が必須です。
+
+| 変数名 | 説明 | 例 |
+| --- | --- | --- |
+| `AWS_REGION` | DynamoDBテーブルのリージョン | `ap-northeast-1` |
+| `DYNAMODB_TABLE` | 使用するテーブル名 | `archimagna` |
+| `AWS_ACCESS_KEY_ID` | DynamoDBへのアクセスを許可するIAMユーザーのアクセスキー | - |
+| `AWS_SECRET_ACCESS_KEY` | 上記アクセスキーのシークレット | - |
+
+IAMユーザーには対象テーブルおよびそのGSIに対する
+`dynamodb:GetItem` / `PutItem` / `UpdateItem` / `Query` / `BatchWriteItem`
+権限を付与してください。ルートアカウントのアクセスキーは使わず、
+以下の最小権限ポリシーを持つ専用IAMユーザーを作成することを推奨します。
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:Query",
+        "dynamodb:BatchWriteItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:ap-northeast-1:970547380183:table/archimagna",
+        "arn:aws:dynamodb:ap-northeast-1:970547380183:table/archimagna/index/*"
+      ]
+    }
+  ]
+}
+```
+
+作成手順（AWSコンソール）:
+1. IAM > ユーザー > ユーザーを作成 で `archimagna-dynamodb-app` などの名前で作成
+2. 「アクセスキー」を発行（用途: アプリケーション実行時のプログラムアクセス）
+3. 上記JSONをインラインポリシーとしてアタッチ
+4. 発行された `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` をVercelの環境変数に設定
+
+## テーブルの作成
+
+初回のみ、以下のスクリプトでテーブル（オンデマンド課金、GSI1付き）を作成します。
+
+```
+AWS_REGION=ap-northeast-1 DYNAMODB_TABLE=archimagna node scripts/create-table.js
+```
+
+## 既存MySQLデータの移行
+
+旧RDS環境にデータが残っている場合、以下のスクリプトで一度だけ
+DynamoDBへ移行できます（`mysql2`は移行時のみ一時的に必要です）。
+
+```
+npm install --no-save mysql2
+REACT_APP_DB_HOST=... REACT_APP_DB_USER=... REACT_APP_DB_PASSWORD=... REACT_APP_DB_NAME=... \
+AWS_REGION=ap-northeast-1 DYNAMODB_TABLE=archimagna \
+node scripts/migrate-mysql-to-dynamo.js
+```
+
+移行および動作確認が完了したら、RDSインスタンスは削除して問題ありません
+（本移行の主目的である、常時課金の解消につながります）。

@@ -1,5 +1,5 @@
 // api/user/list.js
-const db = require('../../knexfile.js');
+const { getUsersByRoom, getUserByToken } = require('../_lib/users.js');
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -7,22 +7,21 @@ export default async function handler(req, res) {
     if (!ROOM_ID) return res.status(400).json({ error: 'ROOM_ID is required' });
 
     try {
+      const roomUsers = await getUsersByRoom(ROOM_ID);
+
       let users;
       let teamMember = [];
-      if(MASTER === "1"){
-        users = await db('USER_TBL').select('*').where({ ROOM_ID });
-      }else{
-        let userTeam = await db('USER_TBL').select('TEAM').where({ TOKEN });
-        console.log(userTeam)
-        users = await db('USER_TBL').select('USER_ID', 'USER_NAME', 'USER_ORDER').where({ ROOM_ID });
-        console.log(users)
-        teamMember = await db('USER_TBL')
-          .select('USER_ID', 'USER_NAME', 'USER_ORDER', 'TEAM')
-          .where({ROOM_ID})
-          .andWhere('TEAM', userTeam[0].TEAM);
-        console.log(teamMember)
+      if (MASTER === '1') {
+        users = roomUsers;
+      } else {
+        const self = await getUserByToken(TOKEN);
+        const myTeam = self ? self.TEAM : undefined;
+        users = roomUsers.map(({ USER_ID, USER_NAME, USER_ORDER }) => ({ USER_ID, USER_NAME, USER_ORDER }));
+        teamMember = roomUsers
+          .filter((u) => u.TEAM === myTeam)
+          .map(({ USER_ID, USER_NAME, USER_ORDER, TEAM }) => ({ USER_ID, USER_NAME, USER_ORDER, TEAM }));
       }
-      res.status(200).json({users: users, teams: teamMember});
+      res.status(200).json({ users, teams: teamMember });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

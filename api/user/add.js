@@ -1,5 +1,5 @@
 // api/user/add.js
-const db = require('../../knexfile.js');
+const { addUsers, getUsersByRoom } = require('../_lib/users.js');
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -7,10 +7,8 @@ export default async function handler(req, res) {
     if (!USER_NAMES || !ROOM_ID) return res.status(400).json({ error: 'USER_NAMES and ROOM_ID are required' });
 
     try {
-      const users = USER_NAMES.map((name, index) => ({ USER_NAME: name, ROOM_ID, USER_ORDER: index }));
-      console.log(db('USER_TBL').insert(users).toSQL())
-      await db('USER_TBL').insert(users);
-      const updatedUsers = await db('USER_TBL').select('*').where({ ROOM_ID });
+      await addUsers(ROOM_ID, USER_NAMES);
+      const updatedUsers = await getUsersByRoom(ROOM_ID);
       res.status(201).json(updatedUsers);
     } catch (error) {
       res.status(500).json({ error: error.message });

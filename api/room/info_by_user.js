@@ -1,5 +1,6 @@
 // api/room/info_by_user.js
-const db = require('../../knexfile.js');
+const { getUserByToken } = require('../_lib/users.js');
+const { getRoomById } = require('../_lib/rooms.js');
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -9,16 +10,14 @@ export default async function handler(req, res) {
     }
 
     try {
-      // サブクエリでユーザーのROOM_IDを取得し、そのROOM_IDに対応するルーム情報を取得します
-      const room = await db('ROOM_TBL')
-        .whereIn('ROOM_ID', function() {
-          this.select('ROOM_ID')
-            .from('USER_TBL')
-            .where({ USER_ID, TOKEN });
-        })
-        .select('*');
+      // TOKENでユーザーを特定し、USER_IDが一致することを確認したうえで所属ルームを取得する
+      const user = await getUserByToken(TOKEN);
+      if (!user || String(user.USER_ID) !== String(USER_ID)) {
+        return res.status(200).json(undefined);
+      }
 
-      res.status(200).json(room[0]);
+      const room = await getRoomById(user.ROOM_ID);
+      res.status(200).json(room);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

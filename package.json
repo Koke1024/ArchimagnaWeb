@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.687.0",
+    "@aws-sdk/lib-dynamodb": "^3.687.0",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.6",
@@ -12,8 +14,6 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "1.7.4",
     "dracula-ui": "^1.0.6",
-    "knex": "^3.1.0",
-    "mysql2": "^3.11.4",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

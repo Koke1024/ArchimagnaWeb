@@ -1,5 +1,5 @@
 // api/room/info.js
-const db = require('../../knexfile.js');
+const { getRoomByToken } = require('../_lib/rooms.js');
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -7,8 +7,8 @@ export default async function handler(req, res) {
     if (!TOKEN) return res.status(400).json({ error: 'TOKEN is required' });
 
     try {
-      const room = await db('ROOM_TBL').select('*').where({ TOKEN });
-      res.status(200).json(room[0]);
+      const room = await getRoomByToken(TOKEN);
+      res.status(200).json(room);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

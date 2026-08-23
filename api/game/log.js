@@ -1,5 +1,5 @@
 // api/game/log.js
-const db = require('../../knexfile.js');
+const { getActionsByRoom } = require('../_lib/actions.js');
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     if (!ROOM_ID) return res.status(400).json({ error: 'ROOM_ID is required' });
 
     try {
-      const logs = await db('ACTION_TBL').select('*').where({ ROOM_ID });
+      const logs = await getActionsByRoom(ROOM_ID);
       res.status(200).json(logs);
     } catch (error) {
       res.status(500).json({ error: error.message });

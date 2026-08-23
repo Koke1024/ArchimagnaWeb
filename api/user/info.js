@@ -1,5 +1,5 @@
 // api/user/info.js
-const db = require('../../knexfile.js');
+const { getUserByToken } = require('../_lib/users.js');
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -7,8 +7,9 @@ export default async function handler(req, res) {
     if (!USER_ID || !TOKEN) return res.status(400).json({ error: 'USER_ID and TOKEN are required' });
 
     try {
-      const user = await db('USER_TBL').select('*').where({ USER_ID, TOKEN });
-      res.status(200).json(user[0]);
+      const user = await getUserByToken(TOKEN);
+      const result = (user && String(user.USER_ID) === String(USER_ID)) ? user : undefined;
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

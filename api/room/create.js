@@ -1,12 +1,11 @@
 // api/room/create.js
-const db = require('../../knexfile.js');
+const { createRoom } = require('../_lib/rooms.js');
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      const [roomId] = await db('ROOM_TBL').insert({ DAY: 0 });
-      const room = await db('ROOM_TBL').select('*').where({ ROOM_ID: roomId });
-      res.status(201).json(room[0]);
+      const room = await createRoom();
+      res.status(201).json(room);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
