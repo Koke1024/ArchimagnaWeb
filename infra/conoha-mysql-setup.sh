@@ -54,10 +54,15 @@ fi
 
 systemctl restart mysql
 
-mysql --user=root <<SQL
+# 初回実行時の root は auth_socket 認証(パスワード不要)だが、2回目以降は
+# 前回このスクリプトが設定したパスワードでの認証が必要になる。
+# MYSQL_PWD を指定しておけば、auth_socket 認証時は無視され、
+# パスワード認証時にはそのまま使われるためどちらでも動作する。
+MYSQL_PWD="${MYSQL_ROOT_PASSWORD}" mysql --user=root <<SQL
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${APP_DB_PASSWORD}';
+ALTER USER '${DB_USER}'@'%' IDENTIFIED BY '${APP_DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'%';
 FLUSH PRIVILEGES;
 SQL
@@ -70,9 +75,10 @@ fi
 
 cat <<EOM
 
-セットアップ完了。Vercel の環境変数に以下を設定してください:
-  REACT_APP_DB_HOST=<このサーバーのグローバルIPアドレス>
-  REACT_APP_DB_USER=${DB_USER}
-  REACT_APP_DB_PASSWORD=<今回入力したアプリ用パスワード>
-  REACT_APP_DB_NAME=${DB_NAME}
+セットアップ完了。Vercel の環境変数に以下を設定してください
+(REACT_APP_ 接頭辞を付けるとクライアント側に漏洩するため付けないこと):
+  DB_HOST=<このサーバーのグローバルIPアドレス>
+  DB_USER=${DB_USER}
+  DB_PASSWORD=<今回入力したアプリ用パスワード>
+  DB_NAME=${DB_NAME}
 EOM
