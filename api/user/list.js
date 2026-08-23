@@ -1,7 +1,7 @@
 // api/user/list.js
 const { getUsersByRoom, getUserByToken } = require('../_lib/users.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     const { ROOM_ID, TOKEN, MASTER } = req.query;
     if (!ROOM_ID) return res.status(400).json({ error: 'ROOM_ID is required' });

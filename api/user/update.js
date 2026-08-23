@@ -3,7 +3,7 @@ const { incrementUserStats, getUsersByRoom } = require('../_lib/users.js');
 const { getRoomById } = require('../_lib/rooms.js');
 const { addAction } = require('../_lib/actions.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }

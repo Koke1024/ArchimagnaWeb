@@ -2,7 +2,7 @@
 const { getUserByToken } = require('../_lib/users.js');
 const { getRoomById } = require('../_lib/rooms.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     const { TOKEN, USER_ID } = req.query;
     if (!TOKEN || !USER_ID) {

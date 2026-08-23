@@ -1,7 +1,7 @@
 // api/user/info.js
 const { getUserByToken } = require('../_lib/users.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     const { USER_ID, TOKEN } = req.query;
     if (!USER_ID || !TOKEN) return res.status(400).json({ error: 'USER_ID and TOKEN are required' });

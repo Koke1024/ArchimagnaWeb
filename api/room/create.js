@@ -1,7 +1,7 @@
 // api/room/create.js
 const { createRoom } = require('../_lib/rooms.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const room = await createRoom();

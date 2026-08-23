@@ -1,7 +1,7 @@
 // api/user/add.js
 const { addUsers, getUsersByRoom } = require('../_lib/users.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'POST') {
     const { USER_NAMES, ROOM_ID } = req.body;
     if (!USER_NAMES || !ROOM_ID) return res.status(400).json({ error: 'USER_NAMES and ROOM_ID are required' });

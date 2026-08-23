@@ -1,7 +1,7 @@
 // api/game/log.js
 const { getActionsByRoom } = require('../_lib/actions.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     const { ROOM_ID } = req.query;
     if (!ROOM_ID) return res.status(400).json({ error: 'ROOM_ID is required' });

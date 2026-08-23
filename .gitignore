@@ -17,6 +17,9 @@
 .env.development.local
 .env.test.local
 .env.production.local
+# セルフホスト (VPS) 用の環境変数ファイル。AWS資格情報を含むため絶対にコミットしない。
+.env
+.env.server
 
 npm-debug.log*
 yarn-debug.log*
