@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.CONOHA_HOST }}
           username: ${{ secrets.CONOHA_SSH_USER }}
           key: ${{ secrets.CONOHA_SSH_PRIVATE_KEY }}
-          envs: MYSQL_ROOT_PASSWORD
+          envs: MYSQL_ROOT_PASSWORD,APP_DB_PASSWORD
           script: |
             set -euo pipefail
 
@@ -37,8 +37,12 @@ jobs:
               SELECT user, host FROM mysql.user WHERE user = 'archimagna';
               SHOW TABLES FROM archi_magna;
             "
+
+            echo "===== archimagna ユーザーでのログイン確認 (現在のAPP_DB_PASSWORD) ====="
+            MYSQL_PWD="$APP_DB_PASSWORD" mysql --host=127.0.0.1 --user=archimagna archi_magna -e "SELECT 1 AS login_ok;"
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          APP_DB_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
 
       - name: Check MySQL port reachability from the internet
         run: |
