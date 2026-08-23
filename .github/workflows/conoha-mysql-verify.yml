@@ -1,0 +1,54 @@
+name: ConoHa MySQL Verify
+
+# ConoHa VPS上のMySQLが期待通りに構成されているかを確認する読み取り専用ワークフロー。
+# サーバーの状態を変更する操作は行いません。
+#
+# 必要なシークレットは conoha-mysql-setup.yml と同じです。
+on:
+  workflow_dispatch: {}
+
+jobs:
+  verify-mysql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect MySQL configuration on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CONOHA_HOST }}
+          username: ${{ secrets.CONOHA_SSH_USER }}
+          key: ${{ secrets.CONOHA_SSH_PRIVATE_KEY }}
+          envs: MYSQL_ROOT_PASSWORD,APP_DB_PASSWORD
+          script: |
+            set -euo pipefail
+
+            echo "===== MySQL service ====="
+            systemctl is-active mysql
+            mysqld --version
+
+            echo "===== bind-address (外部接続の可否) ====="
+            sudo grep -rn "^bind-address" /etc/mysql/ || echo "bind-address の明示指定なし"
+
+            echo "===== 待ち受けポート ====="
+            sudo ss -tlnp | grep 3306 || echo "3306 を待ち受けていません"
+
+            echo "===== データベースとユーザー ====="
+            sudo MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --user=root -e "
+              SHOW DATABASES LIKE 'archi_magna';
+              SELECT user, host FROM mysql.user WHERE user = 'archimagna';
+              SHOW TABLES FROM archi_magna;
+            "
+
+            echo "===== archimagna ユーザーでのログイン確認 (現在のAPP_DB_PASSWORD) ====="
+            MYSQL_PWD="$APP_DB_PASSWORD" mysql --host=127.0.0.1 --user=archimagna archi_magna -e "SELECT 1 AS login_ok;"
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          APP_DB_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
+
+      - name: Check MySQL port reachability from the internet
+        run: |
+          if timeout 10 bash -c "cat < /dev/null > /dev/tcp/${{ secrets.CONOHA_HOST }}/3306"; then
+            echo "外部から 3306 に到達できます"
+          else
+            echo "外部から 3306 に到達できません (bind-address またはファイアウォール設定を確認してください)"
+            exit 1
+          fi
