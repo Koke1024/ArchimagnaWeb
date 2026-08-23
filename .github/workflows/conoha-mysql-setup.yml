@@ -39,7 +39,13 @@ jobs:
           username: ${{ secrets.CONOHA_SSH_USER }}
           key: ${{ secrets.CONOHA_SSH_PRIVATE_KEY }}
           envs: MYSQL_ROOT_PASSWORD,APP_DB_PASSWORD
-          script: sudo -E bash /tmp/conoha-mysql-setup.sh
+          # sudo は環境変数をリセットするため (-E は sudoers 設定により無視される)、
+          # スクリプトに渡すパスワードは sudo の引数として明示的に指定する
+          script: >-
+            sudo
+            MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD"
+            APP_DB_PASSWORD="$APP_DB_PASSWORD"
+            bash /tmp/conoha-mysql-setup.sh
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           APP_DB_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}

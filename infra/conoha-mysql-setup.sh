@@ -21,14 +21,24 @@ if [[ ${EUID} -ne 0 ]]; then
   exit 1
 fi
 
-if [[ -z "${MYSQL_ROOT_PASSWORD:-}" ]]; then
-  read -rsp "MySQL の新しい root パスワードを入力: " MYSQL_ROOT_PASSWORD
+prompt_password() {
+  # $1: 変数名, $2: プロンプト文言
+  local var_name="$1" prompt="$2" value
+  if [[ -n "${!var_name:-}" ]]; then
+    return 0
+  fi
+  if [[ ! -t 0 ]]; then
+    echo "${var_name} が未設定です。非対話実行では環境変数として渡してください。" >&2
+    echo "例: sudo ${var_name}=... bash $0" >&2
+    exit 1
+  fi
+  read -rsp "${prompt}" value
   echo
-fi
-if [[ -z "${APP_DB_PASSWORD:-}" ]]; then
-  read -rsp "アプリ用ユーザー(${DB_USER})のパスワードを入力: " APP_DB_PASSWORD
-  echo
-fi
+  printf -v "${var_name}" '%s' "${value}"
+}
+
+prompt_password MYSQL_ROOT_PASSWORD "MySQL の新しい root パスワードを入力: "
+prompt_password APP_DB_PASSWORD "アプリ用ユーザー(${DB_USER})のパスワードを入力: "
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
