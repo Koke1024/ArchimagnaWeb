@@ -1,0 +1,18 @@
+# Vercelへのアップロード不要なローカルファイル(.env系はVercelプロジェクト設定側の
+# 環境変数を使うため、デプロイ成果物に含めない)
+.env
+.env.*
+AGENTS.md
+description.md
+document
+docs
+infra
+scripts
+server.cjs
+ecosystem.archimagna.cjs
+build
+.idea
+.multica
+.opencode
+.agent_context
+.vercel

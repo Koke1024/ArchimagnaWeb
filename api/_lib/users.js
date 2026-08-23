@@ -89,7 +89,9 @@ async function updateUserRole(roomId, userId, { TEAM, ROLE }) {
   await doc.send(new UpdateCommand({
     TableName: TABLE_NAME,
     Key: userKey(roomId, userId),
-    UpdateExpression: 'SET TEAM = :team, ROLE = :role',
+    // ROLEはDynamoDBの予約語のためExpressionAttributeNamesでエスケープする
+    UpdateExpression: 'SET TEAM = :team, #role = :role',
+    ExpressionAttributeNames: { '#role': 'ROLE' },
     ExpressionAttributeValues: { ':team': TEAM, ':role': ROLE },
   }));
 }

@@ -56,7 +56,9 @@ async function updateRoomPhaseDay(roomId, { PHASE, DAY }) {
   const result = await doc.send(new UpdateCommand({
     TableName: TABLE_NAME,
     Key: roomKey(roomId),
-    UpdateExpression: 'SET PHASE = :p, DAY = :d',
+    // DAYはDynamoDBの予約語のためExpressionAttributeNamesでエスケープする
+    UpdateExpression: 'SET PHASE = :p, #day = :d',
+    ExpressionAttributeNames: { '#day': 'DAY' },
     ExpressionAttributeValues: { ':p': PHASE, ':d': DAY },
     ReturnValues: 'ALL_NEW',
   }));
