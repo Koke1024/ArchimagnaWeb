@@ -120,14 +120,25 @@ ssh -i /path/to/private_key root@160.251.199.53 'sudo bash ~/conoha-mysql-setup.
 
 ## 4. Vercel側の環境変数を更新する
 
+> **重要**: `REACT_APP_` から始まる環境変数は、Create React App のビルド時に
+> 使用箇所を問わず無条件でクライアント側JSバンドルに埋め込まれ、誰でも閲覧できる
+> 状態で公開されます。DB接続情報は `api/**`（サーバー側のみ）で使うため、
+> **`REACT_APP_` を付けないでください**。過去に `REACT_APP_DB_*` という名前を
+> 使っていたことがあり、これは脆弱性でした（knexfile.js は `DB_*` を参照するよう
+> 修正済みです）。
+
 Vercel プロジェクトの Environment Variables に以下を設定し、再デプロイします。
 
 ```
-REACT_APP_DB_HOST=160.251.199.53
-REACT_APP_DB_USER=archimagna
-REACT_APP_DB_PASSWORD=<スクリプト実行時に入力したパスワード>
-REACT_APP_DB_NAME=archi_magna
+DB_HOST=160.251.199.53
+DB_USER=archimagna
+DB_PASSWORD=<スクリプト実行時に入力したパスワード>
+DB_NAME=archi_magna
 ```
+
+もし過去に `REACT_APP_DB_HOST` / `REACT_APP_DB_USER` / `REACT_APP_DB_PASSWORD` /
+`REACT_APP_DB_NAME` を登録していた場合は、上記の `DB_*` を追加したうえで、
+**必ず `REACT_APP_DB_*` の方は削除してください**。
 
 ## 5. 動作確認
 
