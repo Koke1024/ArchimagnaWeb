@@ -1,0 +1,44 @@
+name: ConoHa MySQL Setup
+
+# ConoHa VPS上にArchimagnaWeb用のMySQLを構築する手動実行ワークフロー。
+# GitHubのActionsタブから "Run workflow" を押した時のみ動作します
+# (誤って本番DBのパスワードがリセットされるのを防ぐため、pushでの自動実行はしていません)。
+#
+# 事前に以下のリポジトリシークレットを設定してください
+# (Settings > Secrets and variables > Actions > New repository secret):
+#   CONOHA_HOST             接続先サーバーのグローバルIP (例: 160.251.199.53)
+#   CONOHA_SSH_USER         SSHログインユーザー名 (root または ubuntu)
+#   CONOHA_SSH_PRIVATE_KEY  SSH秘密鍵の中身 (PEM形式そのまま)
+#   MYSQL_ROOT_PASSWORD     MySQL rootパスワード
+#   MYSQL_APP_PASSWORD      アプリ用ユーザー(archimagna)のパスワード
+on:
+  workflow_dispatch: {}
+
+jobs:
+  setup-mysql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy setup script to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.CONOHA_HOST }}
+          username: ${{ secrets.CONOHA_SSH_USER }}
+          key: ${{ secrets.CONOHA_SSH_PRIVATE_KEY }}
+          source: "infra/conoha-mysql-setup.sh"
+          target: "/tmp/"
+          strip_components: 1
+
+      - name: Run MySQL setup script
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CONOHA_HOST }}
+          username: ${{ secrets.CONOHA_SSH_USER }}
+          key: ${{ secrets.CONOHA_SSH_PRIVATE_KEY }}
+          envs: MYSQL_ROOT_PASSWORD,APP_DB_PASSWORD
+          script: sudo -E bash /tmp/conoha-mysql-setup.sh
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          APP_DB_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
