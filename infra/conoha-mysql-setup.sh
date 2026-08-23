@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # ArchimagnaWeb 用 MySQL セットアップスクリプト (ConoHa VPS / Ubuntu 26.04 想定)
 #
-# 使い方:
+# 手動実行の場合:
 #   1. SSHでサーバーにログインする
 #   2. このスクリプトをサーバーに転送する (scp infra/conoha-mysql-setup.sh <user>@<host>:~/)
 #   3. サーバー上で実行する: sudo bash conoha-mysql-setup.sh
+#      -> root / アプリ用パスワードは対話入力になります
 #
-# root / アプリ用パスワードは対話入力です。スクリプト内には残しません。
+# CI (GitHub Actions) から実行する場合:
+#   環境変数 MYSQL_ROOT_PASSWORD / APP_DB_PASSWORD が設定されていれば
+#   対話入力をスキップして自動実行します。
+#   (.github/workflows/conoha-mysql-setup.yml を参照)
 set -euo pipefail
 
 DB_NAME="archi_magna"
@@ -17,10 +21,14 @@ if [[ ${EUID} -ne 0 ]]; then
   exit 1
 fi
 
-read -rsp "MySQL の新しい root パスワードを入力: " MYSQL_ROOT_PASSWORD
-echo
-read -rsp "アプリ用ユーザー(${DB_USER})のパスワードを入力: " APP_DB_PASSWORD
-echo
+if [[ -z "${MYSQL_ROOT_PASSWORD:-}" ]]; then
+  read -rsp "MySQL の新しい root パスワードを入力: " MYSQL_ROOT_PASSWORD
+  echo
+fi
+if [[ -z "${APP_DB_PASSWORD:-}" ]]; then
+  read -rsp "アプリ用ユーザー(${DB_USER})のパスワードを入力: " APP_DB_PASSWORD
+  echo
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
