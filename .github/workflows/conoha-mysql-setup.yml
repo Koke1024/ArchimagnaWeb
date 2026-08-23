@@ -4,8 +4,8 @@ name: ConoHa MySQL Setup
 # GitHubのActionsタブから "Run workflow" を押した時のみ動作します
 # (誤って本番DBのパスワードがリセットされるのを防ぐため、pushでの自動実行はしていません)。
 #
-# 事前に以下のリポジトリシークレットを設定してください
-# (Settings > Secrets and variables > Actions > New repository secret):
+# 事前に以下のシークレットを "Conoha" Environment に設定してください
+# (Settings > Secrets and variables > Actions > Environments > Conoha):
 #   CONOHA_HOST             接続先サーバーのグローバルIP (例: 160.251.199.53)
 #   CONOHA_SSH_USER         SSHログインユーザー名 (root または ubuntu)
 #   CONOHA_SSH_PRIVATE_KEY  SSH秘密鍵の中身 (PEM形式そのまま)
@@ -17,6 +17,7 @@ on:
 jobs:
   setup-mysql:
     runs-on: ubuntu-latest
+    environment: Conoha
     steps:
       - name: Checkout
         uses: actions/checkout@v4

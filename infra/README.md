@@ -46,8 +46,10 @@ ssh -i /path/to/private_key root@160.251.199.53
 GitHub Actions上から自動でセットアップできます。GitHubのActionsランナーは
 通常のインターネット接続を持つため、SSHでVPSに到達できます。
 
-1. リポジトリの **Settings > Secrets and variables > Actions** で以下を登録する
-   （値はGitHub上で暗号化されて保存され、ログにも出力されません）:
+1. リポジトリの **Settings > Secrets and variables > Actions > Environments > Conoha**
+   （`Conoha` という名前のEnvironmentを作成し、その配下）で以下を登録する
+   （値はGitHub上で暗号化されて保存され、ログにも出力されません。
+   ワークフロー側は `environment: Conoha` を指定してこの値を参照します）:
 
    | シークレット名 | 値 |
    |---|---|
