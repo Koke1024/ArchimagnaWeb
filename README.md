@@ -67,15 +67,22 @@ MySQL(RDS)からAWS DynamoDBへ移行済みです。DynamoDBはオンデマン�
 ## 必要な環境変数
 
 Vercelのプロジェクト設定（Environment Variables）に以下を追加してください。
-AWSはIAMロールではなくアクセスキーで認証するため、`AWS_ACCESS_KEY_ID` /
-`AWS_SECRET_ACCESS_KEY` の設定が必須です。
+AWSはIAMロールではなくアクセスキーで認証するため、`DYNAMO_ACCESS_KEY_ID` /
+`DYNAMO_SECRET_ACCESS_KEY` の設定が必須です。
+
+> **重要**: `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` という
+> 名前は**使わないでください**。これらはAWS Lambdaの予約済み環境変数のため、
+> Vercel（Lambda上で動作）でこの名前を設定しても実行時にLambdaランタイム
+> 自身の値（Vercel内部のロール）で上書きされてしまい、意図した認証情報が
+> 一切使われません。そのため、予約されていない `DYNAMO_` 接頭辞の変数名を
+> 使用します。
 
 | 変数名 | 説明 | 例 |
 | --- | --- | --- |
-| `AWS_REGION` | DynamoDBテーブルのリージョン | `ap-northeast-1` |
+| `DYNAMO_REGION` | DynamoDBテーブルのリージョン | `ap-northeast-1` |
 | `DYNAMODB_TABLE` | 使用するテーブル名 | `archimagna` |
-| `AWS_ACCESS_KEY_ID` | DynamoDBへのアクセスを許可するIAMユーザーのアクセスキー | - |
-| `AWS_SECRET_ACCESS_KEY` | 上記アクセスキーのシークレット | - |
+| `DYNAMO_ACCESS_KEY_ID` | DynamoDBへのアクセスを許可するIAMユーザーのアクセスキー | - |
+| `DYNAMO_SECRET_ACCESS_KEY` | 上記アクセスキーのシークレット | - |
 
 IAMユーザーには対象テーブルおよびそのGSIに対する
 `dynamodb:GetItem` / `PutItem` / `UpdateItem` / `Query` / `BatchWriteItem`
@@ -108,7 +115,8 @@ IAMユーザーには対象テーブルおよびそのGSIに対する
 1. IAM > ユーザー > ユーザーを作成 で `archimagna-dynamodb-app` などの名前で作成
 2. 「アクセスキー」を発行（用途: アプリケーション実行時のプログラムアクセス）
 3. 上記JSONをインラインポリシーとしてアタッチ
-4. 発行された `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` をVercelの環境変数に設定
+4. 発行されたアクセスキーを、Vercelの環境変数 `DYNAMO_ACCESS_KEY_ID` /
+   `DYNAMO_SECRET_ACCESS_KEY` に設定（`AWS_ACCESS_KEY_ID` 等ではないので注意）
 
 ## テーブルの作成
 
