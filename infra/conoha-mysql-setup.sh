@@ -7,10 +7,8 @@
 #   3. サーバー上で実行する: sudo bash conoha-mysql-setup.sh
 #      -> root / アプリ用パスワードは対話入力になります
 #
-# CI (GitHub Actions) から実行する場合:
-#   環境変数 MYSQL_ROOT_PASSWORD / APP_DB_PASSWORD が設定されていれば
+# 環境変数 MYSQL_ROOT_PASSWORD / APP_DB_PASSWORD が設定されていれば
 #   対話入力をスキップして自動実行します。
-#   (.github/workflows/conoha-mysql-setup.yml を参照)
 set -euo pipefail
 
 DB_NAME="archi_magna"

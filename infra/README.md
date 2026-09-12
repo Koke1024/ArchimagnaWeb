@@ -40,44 +40,20 @@ ssh -i /path/to/private_key root@160.251.199.53
 
 ## 2. MySQLセットアップスクリプトを実行する
 
-### 方法A: GitHub Actionsで自動実行する（推奨）
-
-`.github/workflows/conoha-mysql-setup.yml` を使うと、手元でSSHコマンドを打たずに
-GitHub Actions上から自動でセットアップできます。GitHubのActionsランナーは
-通常のインターネット接続を持つため、SSHでVPSに到達できます。
-
-1. リポジトリの **Settings > Secrets and variables > Actions > Environments > Conoha**
-   （`Conoha` という名前のEnvironmentを作成し、その配下）で以下を登録する
-   （値はGitHub上で暗号化されて保存され、ログにも出力されません。
-   ワークフロー側は `environment: Conoha` を指定してこの値を参照します）:
-
-   | シークレット名 | 値 |
-   |---|---|
-   | `CONOHA_HOST` | `160.251.199.53` |
-   | `CONOHA_SSH_USER` | `root`（ダメなら `ubuntu`） |
-   | `CONOHA_SSH_PRIVATE_KEY` | SSH秘密鍵の中身（PEM形式そのまま） |
-   | `MYSQL_ROOT_PASSWORD` | MySQL rootパスワード（任意の強固な値） |
-   | `MYSQL_APP_PASSWORD` | アプリ用ユーザー(`archimagna`)のパスワード（任意の強固な値） |
-
-2. GitHubの **Actions** タブ → **ConoHa MySQL Setup** → **Run workflow** を押す
-3. 実行が成功すれば、MySQLのインストールとDB/ユーザー作成が完了する
-
-再実行しても `CREATE DATABASE IF NOT EXISTS` / `CREATE USER IF NOT EXISTS` により
-安全に冪等（べきとう）に動作しますが、`MYSQL_ROOT_PASSWORD` は毎回上書き設定される点に
-注意してください。
-
-### 方法B: 手元の端末からSSHで手動実行する
-
 このディレクトリの `conoha-mysql-setup.sh` をサーバーに転送し、実行します。
 root用パスワードとアプリ用ユーザー(`archimagna`)のパスワードは対話入力です
 （スクリプトやリポジトリには一切残りません）。
+
+> 過去には GitHub Actions 経由で自動実行するワークフロー
+> (`.github/workflows/conoha-mysql-setup.yml`) も存在しましたが、
+> 不要になったため削除済みです。手動実行のみ対応しています。
 
 ```bash
 scp -i /path/to/private_key infra/conoha-mysql-setup.sh root@160.251.199.53:~/
 ssh -i /path/to/private_key root@160.251.199.53 'sudo bash ~/conoha-mysql-setup.sh'
 ```
 
-いずれの方法でも、スクリプトが行うことは同じです:
+スクリプトが行うことは以下の通りです:
 
 - `mysql-server` のインストール、起動
 - 外部接続を受け付けるための `bind-address = 0.0.0.0` 設定
@@ -87,10 +63,9 @@ ssh -i /path/to/private_key root@160.251.199.53 'sudo bash ~/conoha-mysql-setup.
 
 ### セットアップ結果を確認する
 
-**ConoHa MySQL Verify** ワークフロー（`.github/workflows/conoha-mysql-verify.yml`）を
-実行すると、サーバーの状態を変更せずに以下を確認できます。
+サーバーにSSHでログインし、以下を確認できます（状態を変更しない読み取り専用操作です）。
 
-- MySQLサービスが起動しているか、バージョン
+- MySQLサービスが起動しているか、バージョン (`systemctl is-active mysql` / `mysqld --version`)
 - `bind-address` の設定値と、3306番ポートの待ち受け状態
 - `archi_magna` データベースと `archimagna` ユーザーの存在、テーブル一覧
 - インターネット側から3306番ポートに到達できるか
